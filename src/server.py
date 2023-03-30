@@ -4,7 +4,7 @@ Core project code
 
 from fastapi import FastAPI, Request
 
-from config import settings
+from src.config import settings
 
 app = FastAPI()
 

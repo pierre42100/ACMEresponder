@@ -33,7 +33,14 @@ pip install -r requirements.txt
 4. Run the server
 
 ```bash
-uvicorn server:app --reload
+uvicorn src.server:app --reload
+```
+
+## Unit testing
+Simply run the following command:
+
+```bash
+pytest
 ```
 
 ## Code formatting
