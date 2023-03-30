@@ -15,16 +15,25 @@ Lightweight but still useful server-side ACME implementation.
 python3 -m venv venv
 ```
 
+
 2. Switch the shell to the environment:
 
 ```bash
 source venv/bin/activate
 ```
 
+
 3. Setup dependencies
 
 ```bash
 pip install -r requirements.txt
+```
+
+
+4. Run the server
+
+```bash
+uvicorn server:app --reload
 ```
 
 ## Membres
