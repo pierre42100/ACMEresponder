@@ -19,6 +19,7 @@ async def nonce_middleware(request: Request, call_next):
     response.headers["X-Process-Time"] = "todo"
     return response
 
+
 @app.get("/")
 def root():
     """

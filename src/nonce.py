@@ -1,6 +1,7 @@
 import time
 from src.rand_utils import get_random_string
 
+
 class Nonce:
     def __init__(self):
         """
@@ -10,6 +11,7 @@ class Nonce:
         """
         self.expire = time.time() + 3600
         self.nonce = get_random_string(15)
+
 
 """
 The list of nonces
@@ -25,7 +27,7 @@ def cleanupOldNonces():
     NONCES = list(filter(lambda x: time.time() < x.expire, NONCES))
 
 
-def getNewNonce() -> str :
+def getNewNonce() -> str:
     """
     Generate & return a new nonce
     """
