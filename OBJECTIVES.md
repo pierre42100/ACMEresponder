@@ -12,7 +12,7 @@ Planning :
   * [x] Création du dépôt Git 
   * [x] Schéma d’architecture du projet 
   * [x] Construction de la route /directory 
-  * [ ] Génération des nonces (newNonce) 
+  * [x] Génération des nonces (newNonce) 
   * [ ] Création des comptes utilisateurs (newAccount) 
 
 * Second jalon :  

@@ -2,3 +2,4 @@ V1 :
 * Created project
 * Added schema
 * Added /directory route
+* Added /acme/new-nonce route
