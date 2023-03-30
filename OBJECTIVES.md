@@ -11,7 +11,7 @@ Planning :
 * Premier jalon : (pour le prochain cours) 
   * [x] Création du dépôt Git 
   * [x] Schéma d’architecture du projet 
-  * [ ] Construction de la route /directory 
+  * [x] Construction de la route /directory 
   * [ ] Génération des nonces (newNonce) 
   * [ ] Création des comptes utilisateurs (newAccount) 
 
