@@ -36,7 +36,18 @@ pip install -r requirements.txt
 uvicorn server:app --reload
 ```
 
-## Membres
+## Code formatting
+Check for issues:
+```bash
+pylint server.py
+```
+
+Fix coding style issues:
+```bash
+black server.py 
+```
+
+## Members
 * Yanis MAMMAR
 * Ziyed MELIZI
 * Arthur HOCHE
