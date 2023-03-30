@@ -6,6 +6,6 @@ app = FastAPI()
 
 
 @app.get("/")
-def read_root():
+def root():
     return {"name": "Basic ACME responder", "source":"https://github.com/pierre42100/ACMEresponder"} 
 
