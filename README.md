@@ -47,6 +47,10 @@ Fix coding style issues:
 black server.py 
 ```
 
+## Limitations
+* HTTP-based challenge only are supported
+* Nonce are not supported
+
 ## Members
 * Yanis MAMMAR
 * Ziyed MELIZI
