@@ -5,6 +5,7 @@ Core project code
 from fastapi import FastAPI, Request
 
 from src.config import settings
+from src.nonce import getNewNonce
 
 app = FastAPI()
 
@@ -15,8 +16,9 @@ async def nonce_middleware(request: Request, call_next):
     Nonce middleware: handles the processing of nonces
     """
     response = await call_next(request)
-    # TODO: handle nonces
-    response.headers["X-Process-Time"] = "todo"
+    response.headers["Replay-Nonce"] = getNewNonce()
+    response.headers["Link"] = f'<{settings.domain_uri}acme/directory>;rel="index"'
+
     return response
 
 
@@ -47,3 +49,12 @@ def directory():
         "renewalInfo": f"{settings.domain_uri}/get/draft-ietf-acme-ari-00/renewalInfo/",
         "revokeCert": f"{settings.domain_uri}/acme/revoke-cert",
     }
+
+
+@app.head("/acme/new-nonce")
+@app.get("/acme/new-nonce", status_code=204)
+def new_nonce():
+    """
+    Request a new nonce
+    """
+    pass
