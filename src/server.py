@@ -8,6 +8,7 @@ from src.accounts_manager import AccountManager
 from src.config import settings
 from src.jws import JWSReq
 from src.nonce import NoncesManager
+from src.orders_manager import OrdersManager
 
 app = FastAPI()
 
@@ -15,6 +16,12 @@ app = FastAPI()
 class StartupException(Exception):
     """
     Exception that prevent the server from starting up
+    """
+
+
+class RequestException(Exception):
+    """
+    Exception that occurred during request processing
     """
 
 
@@ -96,3 +103,26 @@ def new_account(req: JWSReq, response: Response):
         "contact": [f"mailto:{settings.contact_mail}"],
         "orders": account.orders_url(),
     }
+
+
+@app.post("/acme/new-order", status_code=201)
+def new_account(req: JWSReq, response: Response):
+    """
+    Start a new order eg. enter in the process of issuing
+    a new certificate
+    """
+    jws = req.to_jws(action="new-order")
+
+    if "notBefore" in jws.payload or "notAfter" in jws.payload:
+        raise RequestException("notBefore and notAfter are not supported!")
+
+    # Extract requested domains
+    entries = []
+    for identifier in jws.payload["identifiers"]:
+        if identifier["type"] != "dns":
+            raise RequestException("Only the 'dns' identifier is supported!")
+        entries.append(identifier["value"])
+
+    order = OrdersManager.create(entries)
+    response.headers["Location"] = order.url()
+    return order.status()

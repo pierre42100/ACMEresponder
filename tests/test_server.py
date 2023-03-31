@@ -94,4 +94,4 @@ class TestServer:
             cert_key=AcmeKey.create("rsa2048"),
             provider=HTTPChallengeProviderTest(),
         )
-        # client.get_certificate()
+        client.get_certificate()

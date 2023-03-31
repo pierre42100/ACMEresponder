@@ -26,6 +26,17 @@ class Settings(BaseSettings):
     """
     contact_mail: str = "contact@acme.corp"
 
+    """
+    Orders lifetime: the time a client has to fullfill
+    the expectation of an order, in seconds
+    """
+    order_lifetime: int = 60 * 15
+
+    """
+    Duration of issued certificates
+    """
+    certs_duration: int = 3600 * 24 * 30
+
     def ca_keyfile(self) -> Path:
         """
         Get CA key file
