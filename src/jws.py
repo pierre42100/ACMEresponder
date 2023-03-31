@@ -37,6 +37,7 @@ class JWS:
         protected: str,
         payload: str,
         signature: str,
+        jwk=None,
         newAccount: bool = False,
         checkNonce: bool = True,
     ):
@@ -65,7 +66,9 @@ class JWS:
         if checkNonce and not NoncesManager.consumeNonce(self.protected["nonce"]):
             raise JWSException("Nonce is invalid!")
 
-        if newAccount:
+        if jwk is not None:
+            self.jwk = jwk
+        elif newAccount:
             self.jwk = self.protected["jwk"]
         else:
             # TODO : get jwk for existing accounts

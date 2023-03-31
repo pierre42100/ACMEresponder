@@ -1,4 +1,5 @@
 import pytest
+from src.accounts_manager import AccountManager
 from src.jws import JWS
 import base64
 import json
@@ -55,3 +56,15 @@ class TestJWS:
     def test_parse_random_data(self):
         with pytest.raises(Exception):
             JWS(protected="hello", payload="world", signature="friend")
+
+    def test_parse_new_order(self):
+        jws = JWS(
+            protected="eyJhbGciOiAiRVMyNTYiLCAibm9uY2UiOiAia2NnQUR1aHVvdFhtbFF3IiwgInVybCI6ICJodHRwOi8vbG9jYWxob3N0OjUwMDAvYWNtZS9uZXctb3JkZXIiLCAia2lkIjogImh0dHA6Ly9sb2NhbGhvc3Q6NTAwMC9hY21lL2FjY3QvU3lndGZMdWhtcVZFbnQvb3JkZXJzIn0",
+            payload="eyJpZGVudGlmaWVycyI6IFt7InR5cGUiOiAiZG5zIiwgInZhbHVlIjogImxvY2FsaG9zdCJ9XX0",
+            signature="zNb32a8F3kXD7ZtFtBApnC4k6aCzjEWrxyIV2KZ4auHoY3959Lo0wJ37eha0KoQdj2QSbGzEG02mJmHjGZD2Zg",
+            checkNonce=False,
+            newAccount=False,
+            jwk={"kty": "EC", "crv": "P-256", "x": "HATm0cXq3KQVPH7kI08MRcKeLc2U2Qe9dT7Y3H-a-N0", "y": "8vHcfO0H557GjX0TxqF5JNOrCFWTxJ4pIvePWb69caQ"},
+        )
+
+        assert jws.payload["identifiers"][0]["type"] == "dns"
