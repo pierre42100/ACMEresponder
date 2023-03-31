@@ -19,5 +19,10 @@ class Settings(BaseSettings):
     """
     storage_path: str = "storage"
 
+    """
+    Contact email
+    """
+    contact_mail: str = "contact@acme.corp"
+
 
 settings = Settings()

@@ -6,6 +6,8 @@ import base64
 import json
 
 from jwt import PyJWK
+from pydantic import BaseModel
+from src.config import settings
 
 from src.nonce import consumeNonce
 
@@ -56,15 +58,40 @@ class JWS:
 
         if checkNonce and not consumeNonce(self.protected["nonce"]):
             raise Exception("Nonce is invalid!")
-        
+
         if newAccount:
-            jwk = self.protected["jwk"]
+            self.jwk = self.protected["jwk"]
         else:
             # TODO : get jwk for existing accounts
             raise Exception("existing account authentication unsupported yet!")
 
         # Check signature
         message = ("%s.%s" % (protected, payload)).encode("utf-8")
-        parsed_jwk = PyJWK.from_dict(jwk)
+        parsed_jwk = PyJWK.from_dict(self.jwk)
         if not parsed_jwk.Algorithm.verify(message, parsed_jwk.key, self.signature):
             raise Exception("Signature is invalid!")
+
+
+class JWSReq(BaseModel):
+    protected: str
+    payload: str
+    signature: str
+
+    def to_jws(
+        self,
+        newAccount: bool = False,
+        checkNonce: bool = True,
+        action: str = "new-acct",
+    ) -> JWS:
+        jws = JWS(
+            protected=self.protected,
+            payload=self.payload,
+            signature=self.signature,
+            newAccount=newAccount,
+            checkNonce=checkNonce,
+        )
+
+        if f"{settings.domain_uri}/acme/{action}" != jws.url:
+            raise Exception("Provided URL in JWS is invalid!")
+
+        return jws

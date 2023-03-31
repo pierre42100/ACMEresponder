@@ -2,9 +2,11 @@
 Core project code
 """
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
+from src.accounts_manager import AccountManager
 
 from src.config import settings
+from src.jws import JWSReq
 from src.nonce import getNewNonce
 
 app = FastAPI()
@@ -69,9 +71,19 @@ def new_nonce():
     pass
 
 
-@app.post("/acme/new-acct")
-def new_account():
+@app.post("/acme/new-acct", status_code=201)
+def new_account(req: JWSReq, response: Response):
     """
     Register a new account
     """
-    pass
+    jws = req.to_jws(newAccount=True, action="new-acct")
+    id = AccountManager.createAccount(jws.jwk)
+    account = AccountManager.getAccount(id)
+
+    response.headers["Location"] = account.orders_url()
+
+    return {
+        "status": "valid",
+        "contact": [f"mailto:{settings.contact_mail}"],
+        "orders": account.orders_url(),
+    }

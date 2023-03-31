@@ -3,3 +3,4 @@ V1 :
 * Added schema
 * Added /directory route
 * Added /acme/new-nonce route
+* Added /acme/new-account route

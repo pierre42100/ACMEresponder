@@ -5,6 +5,7 @@ import pytest
 import sewer.client
 from sewer.crypto import AcmeKey
 import uvicorn
+from src.accounts_manager import AccountManager
 from src.config import Settings
 from src.server import app
 import time
@@ -15,7 +16,7 @@ from src.config import settings
 temp_dir = tempfile.TemporaryDirectory()
 
 settings.domain_uri = "http://localhost:5000"
-settings.storage_path =  temp_dir.name
+settings.storage_path = temp_dir.name
 
 
 client = TestClient(app)
@@ -61,5 +62,8 @@ class TestServer:
             ACME_DIRECTORY_URL="http://localhost:5000/directory",
             cert_key=AcmeKey.create("rsa2048"),
         )
-        # res = client.acme_register()
-        # assert res.status_code == 201
+        res = client.acme_register()
+        assert res.status_code == 201
+
+        id = res.headers["location"].split("acct/")[1].split("/")[0]
+        assert AccountManager.existsAccount(id)
