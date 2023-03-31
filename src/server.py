@@ -33,6 +33,14 @@ def root():
     }
 
 
+@app.get("/tos")
+def tos():
+    """
+    Get terms of service
+    """
+    return "Be cool. Don't try to DOS or hack us. Thanks!"
+
+
 @app.get("/directory")
 def directory():
     """
@@ -42,6 +50,7 @@ def directory():
         "keyChange": f"{settings.domain_uri}/acme/key-change",
         "meta": {
             "website": "https://github.com/pierre42100/ACMEresponder",
+            "termsOfService": f"{settings.domain_uri}/tos",
         },
         "newAccount": f"{settings.domain_uri}/acme/new-acct",
         "newNonce": f"{settings.domain_uri}/acme/new-nonce",

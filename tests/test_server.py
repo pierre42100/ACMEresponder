@@ -5,25 +5,24 @@ import pytest
 import sewer.client
 from sewer.crypto import AcmeKey
 import uvicorn
+from src.config import Settings
 from src.server import app
 import time
 
+def get_settings_override():
+    """
+    Override default settings
+    """
+    return Settings(domain_uri="http://localhost:5000")
+
+
 client = TestClient(app)
 
-"""
-def run_server():
-    # Run the server programmatically too
-    uvicorn.run("src.server:app", port=5000, log_level="info")
-
-@pytest.fixture(scope="session", autouse=True)
-def start_server(request):
-    x = threading.Thread(target=run_server, args=(1,))
-    x.start()
-"""
+app.dependency_overrides[get_settings_override] = get_settings_override
 
 @pytest.fixture(scope="session", autouse=True)
 def setUp():
-    """ Bring test server up. """
+    """ Bring a test server up. """
     proc = Process(target=uvicorn.run,
                         args=(app,),
                         kwargs={
@@ -35,7 +34,9 @@ def setUp():
     time.sleep(0.1)  # time for the server to start
 
 class TestServer():
-
+    """
+    Main server tests
+    """
     def test_get_directory(self):
         response = client.get("/directory")
         assert response.status_code == 200
@@ -55,6 +56,6 @@ class TestServer():
             domain_name='localhost',
             account=sewer.client.AcmeAccount.create("secp256r1"),
             is_new_acct=True,
-            ACME_DIRECTORY_URL="http://localhost:5000",
+            ACME_DIRECTORY_URL="http://localhost:5000/directory",
             cert_key=AcmeKey.create("rsa2048")
         )
