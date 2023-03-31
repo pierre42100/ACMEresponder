@@ -36,6 +36,7 @@ class X509:
     """
     X509 Certificates managements
     """
+
     @staticmethod
     def generate_selfsigned_cert(hostname, ip_addresses=None, key=None):
         """

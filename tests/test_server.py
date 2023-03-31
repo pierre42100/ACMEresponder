@@ -10,6 +10,7 @@ import time
 import tempfile
 from src.config import settings
 from src.x509 import X509
+from tests.challenge_provider import HTTPChallengeProviderTest, challenges_server_test
 
 
 # Create temporary directory for storage
@@ -41,6 +42,13 @@ def setUp():
         daemon=True,
     )
     proc.start()
+
+    proc2 = Process(
+        target=challenges_server_test,
+        daemon=True,
+    )
+    proc2.start()
+
     time.sleep(0.1)  # time for the server to start
 
 
@@ -76,3 +84,14 @@ class TestServer:
 
         id = res.headers["location"].split("acct/")[1].split("/")[0]
         assert AccountManager.existsAccount(id)
+
+    def test_gen_certificate(self):
+        client = sewer.client.Client(
+            domain_name="localhost",
+            account=sewer.client.AcmeAccount.create("secp256r1"),
+            is_new_acct=True,
+            ACME_DIRECTORY_URL="http://localhost:5000/directory",
+            cert_key=AcmeKey.create("rsa2048"),
+            provider=HTTPChallengeProviderTest(),
+        )
+        # client.get_certificate()
