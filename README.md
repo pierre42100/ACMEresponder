@@ -56,7 +56,7 @@ black server.py
 
 ## Limitations
 * HTTP-based challenge only are supported
-* Nonce are not supported
+* Account management is limited to accounts creation
 
 ## Members
 * Yanis MAMMAR

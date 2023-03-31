@@ -13,7 +13,7 @@ Planning :
   * [x] Schéma d’architecture du projet 
   * [x] Construction de la route /directory 
   * [x] Génération des nonces (newNonce) 
-  * [ ] Création des comptes utilisateurs (newAccount) 
+  * [x] Création des comptes utilisateurs (newAccount) 
 
 * Second jalon :  
   * [ ] Préparation d’une autorité de certification 
@@ -26,6 +26,7 @@ Planning :
 
 * Jalons bonus 
   * [ ] Révocation des certificats (revokeCert) 
+  * [ ] Gestion des comptes utilisateurs
   * [ ] Changement des clés (keyChange) 
   * [ ] Authentification à l’aide de challenges DNS 
-  * [ ] Prise en charge complète des nonce
+  * [x] Prise en charge complète des nonce
