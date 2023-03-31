@@ -1,24 +1,33 @@
 from multiprocessing import Process
-import threading
 from fastapi.testclient import TestClient
 import pytest
 import sewer.client
 from sewer.crypto import AcmeKey
 import uvicorn
 from src.accounts_manager import AccountManager
-from src.config import Settings
 from src.server import app
 import time
 import tempfile
 from src.config import settings
+from src.x509 import X509
 
 
+# Create temporary directory for storage
 temp_dir = tempfile.TemporaryDirectory()
 
+# Overwrite some configuration values
 settings.domain_uri = "http://localhost:5000"
 settings.storage_path = temp_dir.name
 
+# Generate CA key file & certificate
+cert, key = X509.generate_selfsigned_cert("myca")
+with open(settings.ca_keyfile(), "wb") as f:
+    f.write(key)
 
+with open(settings.ca_certfile(), "wb") as f:
+    f.write(cert)
+
+# Create fake HTTP client
 client = TestClient(app)
 
 

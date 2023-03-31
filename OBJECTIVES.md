@@ -16,7 +16,7 @@ Planning :
   * [x] Création des comptes utilisateurs (newAccount) 
 
 * Second jalon :  
-  * [ ] Préparation d’une autorité de certification 
+  * [x] Préparation d’une autorité de certification 
   * [ ] Demande et vérification des challenges de type HTTP (newOrder) 
   * [ ] Émission de certificats 
 

@@ -29,8 +29,20 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+4. Generate self-signe certification authority
 
-4. Run the server
+```bash
+# Generate storage
+mkdir storage
+
+# Create a CA private key
+openssl genrsa -out storage/ca-privkey.pem 4096
+
+# Create a CA signing key
+openssl req -new -key storage/ca-privkey.pem -x509 -days 1000 -out storage/ca-pubkey.pem -subj "/C=FR/ST=Loire/L=StEtienne/O=Global Security/OU=IT Department/CN=example.com"
+```
+
+5. Run the server
 
 ```bash
 uvicorn src.server:app --reload

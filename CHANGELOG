@@ -4,3 +4,4 @@ V1 :
 * Added /directory route
 * Added /acme/new-nonce route
 * Added /acme/new-account route
+* Automatically generate CA on tests

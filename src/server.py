@@ -12,6 +12,16 @@ from src.nonce import NoncesManager
 app = FastAPI()
 
 
+class StartupException(Exception):
+    """
+    Exception that prevent the server from starting up
+    """
+
+
+if not settings.ca_certfile().exists() or not settings.ca_keyfile().exists():
+    raise StartupException("Missing CA information!")
+
+
 @app.middleware("http")
 async def nonce_middleware(request: Request, call_next):
     """
