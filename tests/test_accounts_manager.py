@@ -1,5 +1,4 @@
 from src.accounts_manager import AccountManager
-from src.nonce import consumeNonce, getNewNonce
 
 
 class TestAccountsManager:

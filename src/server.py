@@ -7,7 +7,7 @@ from src.accounts_manager import AccountManager
 
 from src.config import settings
 from src.jws import JWSReq
-from src.nonce import getNewNonce
+from src.nonce import NoncesManager
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ async def nonce_middleware(request: Request, call_next):
     Nonce middleware: handles the processing of nonces
     """
     response = await call_next(request)
-    response.headers["Replay-Nonce"] = getNewNonce()
+    response.headers["Replay-Nonce"] = NoncesManager.getNewNonce()
     response.headers["Link"] = f'<{settings.domain_uri}acme/directory>;rel="index"'
 
     return response
@@ -68,7 +68,6 @@ def new_nonce():
     """
     Request a new nonce
     """
-    pass
 
 
 @app.post("/acme/new-acct", status_code=201)
@@ -77,8 +76,8 @@ def new_account(req: JWSReq, response: Response):
     Register a new account
     """
     jws = req.to_jws(newAccount=True, action="new-acct")
-    id = AccountManager.createAccount(jws.jwk)
-    account = AccountManager.getAccount(id)
+    accountId = AccountManager.createAccount(jws.jwk)
+    account = AccountManager.getAccount(accountId)
 
     response.headers["Location"] = account.orders_url()
 

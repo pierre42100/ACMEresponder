@@ -9,7 +9,7 @@ from jwt import PyJWK
 from pydantic import BaseModel
 from src.config import settings
 
-from src.nonce import consumeNonce
+from src.nonce import NoncesManager
 
 
 def fix_b64_padding(s):
@@ -19,6 +19,12 @@ def fix_b64_padding(s):
     if len(s) % 4 != 0:
         s += "==="[0 : 4 - (len(s) % 4)]
     return s
+
+
+class JWSException(Exception):
+    """
+    JWS Exception
+    """
 
 
 class JWS:
@@ -44,35 +50,39 @@ class JWS:
         self.signature = base64.urlsafe_b64decode(fix_b64_padding(signature))
 
         if "kid" in self.protected and "jwk" in self.protected:
-            raise Exception("Can't have both kid and jwk at the same time!")
+            raise JWSException("Can't have both kid and jwk at the same time!")
 
         if "kid" in self.protected and newAccount:
-            raise Exception("Can't have account ID in new account requests!")
+            raise JWSException("Can't have account ID in new account requests!")
 
         if "jwk" in self.protected and not newAccount:
-            raise Exception("Can't have jwk in non-new account requests!")
+            raise JWSException("Can't have jwk in non-new account requests!")
 
         if "nonce" not in self.protected or "url" not in self.protected:
-            raise Exception("JWS headers are incomplete!")
+            raise JWSException("JWS headers are incomplete!")
         self.url = self.protected["url"]
 
-        if checkNonce and not consumeNonce(self.protected["nonce"]):
-            raise Exception("Nonce is invalid!")
+        if checkNonce and not NoncesManager.consumeNonce(self.protected["nonce"]):
+            raise JWSException("Nonce is invalid!")
 
         if newAccount:
             self.jwk = self.protected["jwk"]
         else:
             # TODO : get jwk for existing accounts
-            raise Exception("existing account authentication unsupported yet!")
+            raise JWSException("existing account authentication unsupported yet!")
 
         # Check signature
-        message = ("%s.%s" % (protected, payload)).encode("utf-8")
+        message = f"{protected}.{payload}".encode("utf-8")
         parsed_jwk = PyJWK.from_dict(self.jwk)
         if not parsed_jwk.Algorithm.verify(message, parsed_jwk.key, self.signature):
-            raise Exception("Signature is invalid!")
+            raise JWSException("Signature is invalid!")
 
 
 class JWSReq(BaseModel):
+    """
+    Class that old JWS information included in a request
+    """
+
     protected: str
     payload: str
     signature: str
@@ -83,6 +93,9 @@ class JWSReq(BaseModel):
         checkNonce: bool = True,
         action: str = "new-acct",
     ) -> JWS:
+        """
+        Parse a JWS included in a request
+        """
         jws = JWS(
             protected=self.protected,
             payload=self.payload,
@@ -92,6 +105,6 @@ class JWSReq(BaseModel):
         )
 
         if f"{settings.domain_uri}/acme/{action}" != jws.url:
-            raise Exception("Provided URL in JWS is invalid!")
+            raise JWSException("Provided URL in JWS is invalid!")
 
         return jws
