@@ -14,5 +14,10 @@ class Settings(BaseSettings):
 
     domain_uri: str = "http://localhost:8000"
 
+    """
+    Storage path
+    """
+    storage_path: str = "storage"
+
 
 settings = Settings()

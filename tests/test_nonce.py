@@ -1,7 +1,7 @@
 from src.nonce import consumeNonce, getNewNonce
 
 
-class TestClass:
+class TestNonce:
     def test_nonces_are_different(self):
         a = getNewNonce()
         b = getNewNonce()

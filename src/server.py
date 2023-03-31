@@ -67,3 +67,11 @@ def new_nonce():
     Request a new nonce
     """
     pass
+
+
+@app.post("/acme/new-acct")
+def new_account():
+    """
+    Register a new account
+    """
+    pass
