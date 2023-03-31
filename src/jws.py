@@ -7,6 +7,7 @@ import json
 
 from jwt import PyJWK
 from pydantic import BaseModel
+from src.accounts_manager import AccountManager
 from src.config import settings
 
 from src.nonce import NoncesManager
@@ -71,8 +72,8 @@ class JWS:
         elif newAccount:
             self.jwk = self.protected["jwk"]
         else:
-            # TODO : get jwk for existing accounts
-            raise JWSException("existing account authentication unsupported yet!")
+            self.kid = self.protected["kid"]
+            self.jwk = AccountManager.getAccountByKid(self.kid).jwk
 
         # Check signature
         message = f"{protected}.{payload}".encode("utf-8")

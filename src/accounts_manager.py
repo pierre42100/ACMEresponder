@@ -71,3 +71,10 @@ class AccountManager:
         """
         with open(AccountManager.account_path(accId), "r", encoding="utf-8") as f:
             return Account(accId, json.loads(f.read()))
+
+    @staticmethod
+    def getAccountByKid(kid: str) -> Account:
+        """
+        Get an existing account by its kid. ie by its order URL
+        """
+        return AccountManager.getAccount(kid.split("/acme/acct/")[1].split("/")[0])
