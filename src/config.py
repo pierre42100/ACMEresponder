@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     """
     certs_duration: int = 3600 * 24 * 30
 
+    """
+    The port where the server should connect to on client
+    to check for HTTP challenge. This value should never
+    have to change.
+    """
+    http_challenge_port = 80
+
     def ca_keyfile(self) -> Path:
         """
         Get CA key file

@@ -1,10 +1,14 @@
 """
 Manages orders, challenges request
 """
+import json
 import time
+from src.accounts_manager import Account
+from src.base64_utils import safe_base64_encode
 from src.config import settings
 from src.rand_utils import get_random_string
-import datetime
+from hashlib import sha256
+import requests
 
 from src.time_utils import fmt_time
 
@@ -27,6 +31,35 @@ class OrderDomain:
         self.full_filled = False
         self.http_challenge_id = get_random_string(10)
         self.http_challenge_token = get_random_string(20)
+
+    def http_challenge_url(self) -> str:
+        """
+        Get the URL where a challenge must be checked
+        """
+        return f"http://{self.domain}:{settings.http_challenge_port}/.well-known/acme-challenge/{self.http_challenge_token}"
+
+    def check_http_challenge(self, account_jwk) -> bool:
+        """
+        Attempt to validate the HTTP challenge
+        """
+        response = requests.get(self.http_challenge_url(), allow_redirects=True)
+
+        if response.status_code != 200:
+            return False
+
+        acme_header_jwk_json = json.dumps(
+            account_jwk, sort_keys=True, separators=(",", ":")
+        )
+        acme_thumbprint = safe_base64_encode(
+            sha256(acme_header_jwk_json.encode("utf8")).digest()
+        )
+        acme_keyauthorization = f"{self.http_challenge_token}.{acme_thumbprint}"
+
+        if acme_keyauthorization != response.text:
+            return False
+
+        self.full_filled = True
+        return True
 
     def status(self) -> str:
         """
@@ -132,7 +165,7 @@ class OrdersManager:
         return order
 
     @staticmethod
-    def find_by_authz_id(account_id: str, authz_id: str) -> OrderDomain:
+    def find_domain_by_authz_id(account_id: str, authz_id: str) -> OrderDomain:
         """
         Find an OrderDomain by its AuthzID
         """
@@ -146,3 +179,19 @@ class OrdersManager:
                     return domain
 
         raise OrderException("Failed to find domain by its authz!")
+
+    @staticmethod
+    def find_domain_by_http_chall_id(account_id: str, chall_id: str) -> OrderDomain:
+        """
+        Find an OrderDomain by its HTTP Challenge ID
+        """
+        global ORDERS
+
+        for order in ORDERS:
+            if order.account_id != account_id:
+                continue
+            for domain in order.domains:
+                if domain.http_challenge_id == chall_id:
+                    return domain
+
+        raise OrderException("Failed to find domain by its challenge id!")

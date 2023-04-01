@@ -10,7 +10,11 @@ import time
 import tempfile
 from src.config import settings
 from src.x509 import X509
-from tests.challenge_provider import HTTPChallengeProviderTest, challenges_server_test
+from tests.challenge_provider import (
+    PROVIDER_PORT,
+    HTTPChallengeProviderTest,
+    challenges_server_test,
+)
 
 
 # Create temporary directory for storage
@@ -19,6 +23,7 @@ temp_dir = tempfile.TemporaryDirectory()
 # Overwrite some configuration values
 settings.domain_uri = "http://localhost:5000"
 settings.storage_path = temp_dir.name
+settings.http_challenge_port = PROVIDER_PORT
 
 # Generate CA key file & certificate
 cert, key = X509.generate_selfsigned_cert("myca")

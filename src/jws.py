@@ -8,18 +8,10 @@ import json
 from jwt import PyJWK
 from pydantic import BaseModel
 from src.accounts_manager import AccountManager
+from src.base64_utils import safe_base64_decode
 from src.config import settings
 
 from src.nonce import NoncesManager
-
-
-def fix_b64_padding(s):
-    """
-    Fix Base64 padding potential issue
-    """
-    if len(s) % 4 != 0:
-        s += "==="[0 : 4 - (len(s) % 4)]
-    return s
 
 
 class JWSException(Exception):
@@ -45,15 +37,11 @@ class JWS:
         """
         Initialize a new JWS from a request
         """
-        self.protected = json.loads(
-            base64.urlsafe_b64decode(fix_b64_padding(protected))
-        )
+        self.protected = json.loads(safe_base64_decode(protected))
         self.payload = (
-            None
-            if payload == ""
-            else json.loads(base64.urlsafe_b64decode(fix_b64_padding(payload)))
+            None if payload == "" else json.loads(safe_base64_decode(payload))
         )
-        self.signature = base64.urlsafe_b64decode(fix_b64_padding(signature))
+        self.signature = safe_base64_decode(signature)
 
         if "kid" in self.protected and "jwk" in self.protected:
             raise JWSException("Can't have both kid and jwk at the same time!")

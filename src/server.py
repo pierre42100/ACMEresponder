@@ -138,6 +138,19 @@ def authz_status(authz_id: str, req: JWSReq):
     is supported
     """
     jws = req.to_jws(action=f"authz/{authz_id}")
-    authz = OrdersManager.find_by_authz_id(jws.account_id, authz_id=authz_id)
+    authz = OrdersManager.find_domain_by_authz_id(jws.account_id, authz_id=authz_id)
 
     return authz.info()
+
+
+@app.post("/acme/chall/{chall_id}")
+def try_challenge(chall_id: str, req: JWSReq):
+    """
+    Attempt to validate a challenge
+    """
+    jws = req.to_jws(action=f"chall/{chall_id}")
+    authz = OrdersManager.find_domain_by_http_chall_id(
+        jws.account_id, chall_id=chall_id
+    )
+
+    authz.check_http_challenge(jws.jwk)
