@@ -4,13 +4,14 @@ Manages orders, challenges request
 import json
 import time
 from src.accounts_manager import Account
-from src.base64_utils import safe_base64_encode
+from src.base64_utils import safe_base64_decode, safe_base64_encode
 from src.config import settings
 from src.rand_utils import get_random_string
 from hashlib import sha256
 import requests
 
 from src.time_utils import fmt_time
+from src.x509 import X509
 
 
 class OrderException(Exception):
@@ -98,6 +99,8 @@ class Order:
         self.not_before = time.time()
         self.not_after = time.time() + settings.certs_duration
         self.domains = list(map(lambda d: OrderDomain(d, expire=self.expire), domains))
+        self.crt = None
+        self.cert_id = None
 
     def is_expired(self) -> bool:
         """
@@ -111,6 +114,36 @@ class Order:
         """
         return all(x.full_filled for x in self.domains)
 
+    def sign_csr(self, csr: str):
+        """
+        Sign the CSR of a client, if possible
+        """
+        if self.crt is not None:
+            raise OrderException("A certificate has already been issued!")
+
+        if not self.is_full_filled():
+            raise OrderException("The client did not comply with all requirements!")
+
+        decoded_csr = safe_base64_decode(csr)
+        domains = list(map(lambda d: d.domain, self.domains))
+        X509.check_csr(csrb=decoded_csr, domains=domains)
+
+        with open(settings.ca_keyfile(), "rb") as f:
+            ca_privkey = f.read()
+
+        with open(settings.ca_certfile(), "rb") as f:
+            ca_pubkey = f.read()
+
+        self.crt = X509.sign_csr(
+            ca_privkey=ca_privkey,
+            ca_pubkey=ca_pubkey,
+            csr=decoded_csr,
+            domains=domains,
+            not_before=self.not_before,
+            not_after=self.not_after,
+        )
+        self.cert_id = get_random_string(10)
+
     def url(self):
         """
         Get order URL
@@ -121,6 +154,8 @@ class Order:
         """
         Get current order status, as text
         """
+        if self.crt is not None:
+            return "valid"
         if self.is_full_filled():
             return "ready"
         return "pending"
@@ -129,7 +164,7 @@ class Order:
         """
         Give output information returned to the client
         """
-        return {
+        status = {
             "status": self.status(),
             "expires": fmt_time(self.expire),
             "notBefore": fmt_time(self.not_before),
@@ -142,6 +177,11 @@ class Order:
             ),
             "finalize": f"{settings.domain_uri}/acme/order/{self.id}/finalize",
         }
+
+        if self.cert_id is not None:
+            status["certificate"] = f"{settings.domain_uri}/acme/cert/{self.cert_id}"
+
+        return status
 
 
 # TODO : cleanup old orders
@@ -163,6 +203,17 @@ class OrdersManager:
         ORDERS = list(filter(lambda o: not o.is_expired(), ORDERS))
         ORDERS.append(order)
         return order
+
+    @staticmethod
+    def find_order_by_id(account_id: str, order_id: str) -> Order:
+        """
+        Find an order by its id
+        """
+        global ORDERS
+
+        return next(
+            filter(lambda x: x.account_id == account_id and x.id == order_id, ORDERS)
+        )
 
     @staticmethod
     def find_domain_by_authz_id(account_id: str, authz_id: str) -> OrderDomain:

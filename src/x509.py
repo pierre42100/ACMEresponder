@@ -109,23 +109,23 @@ class X509:
         return cert_pem, key_pem
 
     @staticmethod
-    def check_crl(crlb: bytes, domains: list[str]):
+    def check_csr(csrb: bytes, domains: list[str]):
         """
-        Check if a CRL is valid for signature
+        Check if a CSR is valid for signature
 
         Only the CN attribute of the subject is expected
         """
-        crl = x509.load_der_x509_csr(crlb)
+        csr = x509.load_der_x509_csr(csrb)
 
-        if not crl.is_signature_valid:
+        if not csr.is_signature_valid:
             raise X509Exception("Signature of CRL file is invalid!")
 
-        subj_domain = crl.subject.rfc4514_string().replace("CN=", "")
+        subj_domain = csr.subject.rfc4514_string().replace("CN=", "")
         if not subj_domain in domains:
             raise X509Exception("Subject should be one of the domains name!")
 
         # Check altnames
-        altNames = crl.extensions.get_extension_for_oid(
+        altNames = csr.extensions.get_extension_for_oid(
             ExtensionOID.SUBJECT_ALTERNATIVE_NAME
         )
 
@@ -134,7 +134,7 @@ class X509:
                 raise X509Exception(f"Invalid alt name found: ${altName.value}")
 
     @staticmethod
-    def sign_crl(
+    def sign_csr(
         ca_privkey: bytes,
         ca_pubkey: bytes,
         csr: bytes,

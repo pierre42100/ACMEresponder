@@ -18,15 +18,15 @@ class TestValidateCRL:
     """
 
     def test_check_crl_valid(self):
-        X509.check_crl(FIRST_CRL, ["localhost"])
+        X509.check_csr(FIRST_CRL, ["localhost"])
 
     def test_check_crl_invalid_hostname(self):
         with pytest.raises(Exception):
-            X509.check_crl(FIRST_CRL, ["google.fr"])
+            X509.check_csr(FIRST_CRL, ["google.fr"])
 
     def test_check_crl_random_input(self):
         with pytest.raises(Exception):
-            X509.check_crl(b"randm", ["test"])
+            X509.check_csr(b"randm", ["test"])
 
 
 class TestSignCRL:
@@ -38,7 +38,7 @@ class TestSignCRL:
         not_before = time.time()
         not_after = time.time() + 3600
 
-        cert_bytes = X509.sign_crl(
+        cert_bytes = X509.sign_csr(
             ca_privkey=ca_privkey,
             ca_pubkey=ca_pubkey,
             csr=FIRST_CRL,
@@ -46,11 +46,10 @@ class TestSignCRL:
             not_before=not_before,
             not_after=not_after,
         )
-        
+
         cert = x509.load_pem_x509_certificate(cert_bytes)
         ca_pubkey_parsed = x509.load_pem_x509_certificate(ca_pubkey)
 
         assert cert.not_valid_before == parse_unix_time(not_before)
         assert cert.not_valid_after == parse_unix_time(not_after)
         cert.verify_directly_issued_by(ca_pubkey_parsed)
-

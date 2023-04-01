@@ -154,3 +154,17 @@ def try_challenge(chall_id: str, req: JWSReq):
     )
 
     authz.check_http_challenge(jws.jwk)
+
+
+@app.post("/acme/order/{order_id}/finalize")
+def finalize_order(order_id: str, req: JWSReq, response: Response):
+    """
+    Submit the CSR to be signed
+    """
+    jws = req.to_jws(action=f"order/{order_id}/finalize")
+    order = OrdersManager.find_order_by_id(jws.account_id, order_id=order_id)
+
+    order.sign_csr(csr=jws.payload["csr"])
+
+    response.headers["Location"] = order.url()
+    return order.info()
