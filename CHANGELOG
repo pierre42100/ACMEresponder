@@ -5,3 +5,4 @@ V1 :
 * Added /acme/new-nonce route
 * Added /acme/new-account route
 * Automatically generate CA on tests
+* Added /acme/new-order route(s) -> new-order, challenge, finalize, cert
