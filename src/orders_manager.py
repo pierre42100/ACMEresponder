@@ -128,15 +128,9 @@ class Order:
         domains = list(map(lambda d: d.domain, self.domains))
         X509.check_csr(csrb=decoded_csr, domains=domains)
 
-        with open(settings.ca_keyfile(), "rb") as f:
-            ca_privkey = f.read()
-
-        with open(settings.ca_certfile(), "rb") as f:
-            ca_pubkey = f.read()
-
         self.crt = X509.sign_csr(
-            ca_privkey=ca_privkey,
-            ca_pubkey=ca_pubkey,
+            ca_privkey=settings.ca_get_keyfile(),
+            ca_pubkey=settings.ca_get_certfile(),
             csr=decoded_csr,
             domains=domains,
             not_before=self.not_before,
@@ -213,6 +207,19 @@ class OrdersManager:
 
         return next(
             filter(lambda x: x.account_id == account_id and x.id == order_id, ORDERS)
+        )
+
+    @staticmethod
+    def find_order_by_cert_id(account_id: str, cert_id: str) -> Order:
+        """
+        Find an order by certificates id
+        """
+        global ORDERS
+
+        return next(
+            filter(
+                lambda x: x.account_id == account_id and x.cert_id == cert_id, ORDERS
+            )
         )
 
     @staticmethod

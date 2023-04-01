@@ -9,6 +9,7 @@ from src.config import settings
 from src.jws import JWSReq
 from src.nonce import NoncesManager
 from src.orders_manager import OrdersManager
+from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
@@ -168,3 +169,17 @@ def finalize_order(order_id: str, req: JWSReq, response: Response):
 
     response.headers["Location"] = order.url()
     return order.info()
+
+
+@app.post("/acme/cert/{cert_id}", response_class=PlainTextResponse)
+def finalize_order(cert_id: str, req: JWSReq, response: Response):
+    """
+    Retrieve the issued certificate
+    """
+    jws = req.to_jws(action=f"cert/{cert_id}")
+    order = OrdersManager.find_order_by_cert_id(jws.account_id, cert_id=cert_id)
+
+    chain = f"{order.crt.decode()}{settings.ca_get_certfile().decode()}"
+
+    response.headers["Content-Type"] = "application/pem-certificate-chain"
+    return chain
