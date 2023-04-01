@@ -25,11 +25,17 @@ X509 certificate management
 from datetime import datetime, timedelta
 import ipaddress
 from cryptography import x509
-from cryptography.x509.oid import NameOID
+from cryptography.x509.oid import NameOID, ExtensionOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+
+
+class X509Exception(Exception):
+    """
+    Exception that occurred during X509 files processing
+    """
 
 
 class X509:
@@ -92,3 +98,27 @@ class X509:
         )
 
         return cert_pem, key_pem
+
+    @staticmethod
+    def check_crl(crlb: bytes, domains: list[str]):
+        """
+        Check if a CRL is valid for signature
+
+        Only the CN attribute of the subject is expected
+        """
+        crl = x509.load_der_x509_csr(crlb)
+
+        if not crl.is_signature_valid:
+            raise X509Exception("Signature of CRL file is invalid!")
+
+        subj_domain = crl.subject.rfc4514_string().replace("CN=", "")
+        if not subj_domain in domains:
+            raise X509Exception("Subject should be one of the domains name!")
+
+        # Check altnames
+        altNames = crl.extensions.get_extension_for_oid(
+            ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+        )
+        for altName in list(altNames.value):
+            if altName.value not in domains:
+                raise X509Exception(f"Invalid alt name found: ${altName.value}")
