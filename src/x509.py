@@ -119,6 +119,7 @@ class X509:
         altNames = crl.extensions.get_extension_for_oid(
             ExtensionOID.SUBJECT_ALTERNATIVE_NAME
         )
+
         for altName in list(altNames.value):
             if altName.value not in domains:
                 raise X509Exception(f"Invalid alt name found: ${altName.value}")

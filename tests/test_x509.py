@@ -1,3 +1,4 @@
+import pytest
 from src.base64_utils import safe_base64_decode
 from src.x509 import X509
 
@@ -13,3 +14,11 @@ class TestX509:
 
     def test_check_crl_valid(self):
         X509.check_crl(FIRST_CRL, ["localhost"])
+
+    def test_check_crl_invalid_hostname(self):
+        with pytest.raises(Exception):
+            X509.check_crl(FIRST_CRL, ["google.fr"])
+
+    def test_check_crl_random_input(self):
+        with pytest.raises(Exception):
+            X509.check_crl(b"randm", ["test"])
