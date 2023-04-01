@@ -21,7 +21,7 @@ class HTTPChallengeProviderTest(ProviderBase):
 
     def setup(self, challenges: ChalListType) -> ErrataListType:
         for c in challenges:
-            requests.post(
+            requests.put(
                 url=f"http://localhost:{PROVIDER_PORT}/.well-known/acme-challenge/{c['token']}",
                 data=c["key_auth"],
             )

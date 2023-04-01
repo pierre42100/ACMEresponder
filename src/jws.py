@@ -48,7 +48,11 @@ class JWS:
         self.protected = json.loads(
             base64.urlsafe_b64decode(fix_b64_padding(protected))
         )
-        self.payload = json.loads(base64.urlsafe_b64decode(fix_b64_padding(payload)))
+        self.payload = (
+            None
+            if payload == ""
+            else json.loads(base64.urlsafe_b64decode(fix_b64_padding(payload)))
+        )
         self.signature = base64.urlsafe_b64decode(fix_b64_padding(signature))
 
         if "kid" in self.protected and "jwk" in self.protected:
@@ -73,7 +77,9 @@ class JWS:
             self.jwk = self.protected["jwk"]
         else:
             self.kid = self.protected["kid"]
-            self.jwk = AccountManager.getAccountByKid(self.kid).jwk
+            account = AccountManager.getAccountByKid(self.kid)
+            self.jwk = account.jwk
+            self.account_id = account.id
 
         # Check signature
         message = f"{protected}.{payload}".encode("utf-8")

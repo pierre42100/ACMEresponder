@@ -123,6 +123,21 @@ def new_account(req: JWSReq, response: Response):
             raise RequestException("Only the 'dns' identifier is supported!")
         entries.append(identifier["value"])
 
-    order = OrdersManager.create(entries)
+    order = OrdersManager.create(domains=entries, account_id=jws.account_id)
     response.headers["Location"] = order.url()
-    return order.status()
+    return order.info()
+
+
+@app.post("/acme/authz/{authz_id}")
+def authz_status(authz_id: str, req: JWSReq):
+    """
+    Get the current status of an authorization.
+
+    In this implementation of the ACME server, only the
+    authorization for the issuance of DNS certificates
+    is supported
+    """
+    jws = req.to_jws(action=f"authz/{authz_id}")
+    authz = OrdersManager.find_by_authz_id(jws.account_id, authz_id=authz_id)
+
+    return authz.info()
