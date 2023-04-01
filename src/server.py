@@ -8,6 +8,8 @@ from src.accounts_manager import AccountManager
 from src.config import settings
 from src.jws import JWSReq
 from src.nonce import NoncesManager
+from src.orders_manager import OrdersManager
+from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
@@ -15,6 +17,12 @@ app = FastAPI()
 class StartupException(Exception):
     """
     Exception that prevent the server from starting up
+    """
+
+
+class RequestException(Exception):
+    """
+    Exception that occurred during request processing
     """
 
 
@@ -96,3 +104,82 @@ def new_account(req: JWSReq, response: Response):
         "contact": [f"mailto:{settings.contact_mail}"],
         "orders": account.orders_url(),
     }
+
+
+@app.post("/acme/new-order", status_code=201)
+def new_account(req: JWSReq, response: Response):
+    """
+    Start a new order eg. enter in the process of issuing
+    a new certificate
+    """
+    jws = req.to_jws(action="new-order")
+
+    if "notBefore" in jws.payload or "notAfter" in jws.payload:
+        raise RequestException("notBefore and notAfter are not supported!")
+
+    # Extract requested domains
+    entries = []
+    for identifier in jws.payload["identifiers"]:
+        if identifier["type"] != "dns":
+            raise RequestException("Only the 'dns' identifier is supported!")
+        entries.append(identifier["value"])
+
+    order = OrdersManager.create(domains=entries, account_id=jws.account_id)
+    response.headers["Location"] = order.url()
+    return order.info()
+
+
+@app.post("/acme/authz/{authz_id}")
+def authz_status(authz_id: str, req: JWSReq):
+    """
+    Get the current status of an authorization.
+
+    In this implementation of the ACME server, only the
+    authorization for the issuance of DNS certificates
+    is supported
+    """
+    jws = req.to_jws(action=f"authz/{authz_id}")
+    authz = OrdersManager.find_domain_by_authz_id(jws.account_id, authz_id=authz_id)
+
+    return authz.info()
+
+
+@app.post("/acme/chall/{chall_id}")
+def try_challenge(chall_id: str, req: JWSReq):
+    """
+    Attempt to validate a challenge
+    """
+    jws = req.to_jws(action=f"chall/{chall_id}")
+    authz = OrdersManager.find_domain_by_http_chall_id(
+        jws.account_id, chall_id=chall_id
+    )
+
+    authz.check_http_challenge(jws.jwk)
+
+
+@app.post("/acme/order/{order_id}/finalize")
+def finalize_order(order_id: str, req: JWSReq, response: Response):
+    """
+    Submit the CSR to be signed
+    """
+    jws = req.to_jws(action=f"order/{order_id}/finalize")
+    order = OrdersManager.find_order_by_id(jws.account_id, order_id=order_id)
+
+    order.sign_csr(csr=jws.payload["csr"])
+
+    response.headers["Location"] = order.url()
+    return order.info()
+
+
+@app.post("/acme/cert/{cert_id}", response_class=PlainTextResponse)
+def finalize_order(cert_id: str, req: JWSReq, response: Response):
+    """
+    Retrieve the issued certificate
+    """
+    jws = req.to_jws(action=f"cert/{cert_id}")
+    order = OrdersManager.find_order_by_cert_id(jws.account_id, cert_id=cert_id)
+
+    chain = f"{order.crt.decode()}{settings.ca_get_certfile().decode()}"
+
+    response.headers["Content-Type"] = "application/pem-certificate-chain"
+    return chain

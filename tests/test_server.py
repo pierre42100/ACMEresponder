@@ -8,9 +8,15 @@ from src.accounts_manager import AccountManager
 from src.server import app
 import time
 import tempfile
+from cryptography import x509
+from cryptography.x509.oid import ExtensionOID
 from src.config import settings
 from src.x509 import X509
-from tests.challenge_provider import HTTPChallengeProviderTest, challenges_server_test
+from tests.challenge_provider import (
+    PROVIDER_PORT,
+    HTTPChallengeProviderTest,
+    challenges_server_test,
+)
 
 
 # Create temporary directory for storage
@@ -19,6 +25,7 @@ temp_dir = tempfile.TemporaryDirectory()
 # Overwrite some configuration values
 settings.domain_uri = "http://localhost:5000"
 settings.storage_path = temp_dir.name
+settings.http_challenge_port = PROVIDER_PORT
 
 # Generate CA key file & certificate
 cert, key = X509.generate_selfsigned_cert("myca")
@@ -91,7 +98,18 @@ class TestServer:
             account=sewer.client.AcmeAccount.create("secp256r1"),
             is_new_acct=True,
             ACME_DIRECTORY_URL="http://localhost:5000/directory",
+            ACME_AUTH_STATUS_WAIT_PERIOD=1,
             cert_key=AcmeKey.create("rsa2048"),
             provider=HTTPChallengeProviderTest(),
         )
-        # client.get_certificate()
+        cert = client.get_certificate()
+        certificates = x509.load_pem_x509_certificates(cert.encode("utf-8"))
+
+        assert len(certificates) == 2
+        certificates[0].verify_directly_issued_by(certificates[1])
+
+        altNames = certificates[0].extensions.get_extension_for_oid(
+            ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+        )
+        assert len(list(altNames.value)) == 1
+        assert altNames.value[0].value == "localhost"

@@ -64,7 +64,12 @@ class TestJWS:
             signature="zNb32a8F3kXD7ZtFtBApnC4k6aCzjEWrxyIV2KZ4auHoY3959Lo0wJ37eha0KoQdj2QSbGzEG02mJmHjGZD2Zg",
             checkNonce=False,
             newAccount=False,
-            jwk={"kty": "EC", "crv": "P-256", "x": "HATm0cXq3KQVPH7kI08MRcKeLc2U2Qe9dT7Y3H-a-N0", "y": "8vHcfO0H557GjX0TxqF5JNOrCFWTxJ4pIvePWb69caQ"},
+            jwk={
+                "kty": "EC",
+                "crv": "P-256",
+                "x": "HATm0cXq3KQVPH7kI08MRcKeLc2U2Qe9dT7Y3H-a-N0",
+                "y": "8vHcfO0H557GjX0TxqF5JNOrCFWTxJ4pIvePWb69caQ",
+            },
         )
 
         assert jws.payload["identifiers"][0]["type"] == "dns"
