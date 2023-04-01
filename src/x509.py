@@ -2,6 +2,12 @@
 X509 certificate management
 """
 
+
+# Part of this code was taken from a GitHub Gist of Simon Davy.
+#
+# The code related is the following one :
+# * method generate_selfsigned_cert
+#
 # Copyright 2018 Simon Davy
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +36,9 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+
+from src.time_utils import parse_unix_time
 
 
 class X509Exception(Exception):
@@ -83,7 +92,7 @@ class X509:
             .subject_name(name)
             .issuer_name(name)
             .public_key(key.public_key())
-            .serial_number(1000)
+            .serial_number(x509.random_serial_number())
             .not_valid_before(now)
             .not_valid_after(now + timedelta(days=10 * 365))
             .add_extension(basic_contraints, False)
@@ -123,3 +132,41 @@ class X509:
         for altName in list(altNames.value):
             if altName.value not in domains:
                 raise X509Exception(f"Invalid alt name found: ${altName.value}")
+
+    @staticmethod
+    def sign_crl(
+        ca_privkey: bytes,
+        ca_pubkey: bytes,
+        csr: bytes,
+        domains: list[str],
+        not_before: bytes,
+        not_after: bytes,
+    ) -> bytes:
+        """
+        Sign a CRL with a certification authority
+        """
+        crl_parsed = x509.load_der_x509_csr(csr)
+        ca_privkey_parsed = load_pem_private_key(ca_privkey, password=None)
+        ca_pubkey_parsed = x509.load_pem_x509_certificate(ca_pubkey)
+
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(crl_parsed.subject)
+            .issuer_name(ca_pubkey_parsed.issuer)
+            .public_key(ca_pubkey_parsed.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(parse_unix_time(not_before))
+            .not_valid_after(parse_unix_time(not_after))
+            .add_extension(
+                x509.SubjectAlternativeName(
+                    list(map(lambda d: x509.DNSName(d), domains))
+                ),
+                critical=False,
+            )
+            .add_extension(
+                x509.BasicConstraints(ca=False, path_length=None), critical=True
+            )
+            .sign(ca_privkey_parsed, hashes.SHA256(), default_backend())
+        )
+
+        return cert.public_bytes(encoding=serialization.Encoding.PEM)
