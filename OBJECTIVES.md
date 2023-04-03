@@ -21,7 +21,7 @@ Planning :
     * [x] Première émission de certificat
     * [x] Nettoyage des anciens ordres
     * [x] Prise en  compte des expirations
-    * [ ] Rate limiting
+    * [x] Rate limiting
   * [x] Émission de certificats 
 
 * Troisième jalon : (07/04/2023) 
