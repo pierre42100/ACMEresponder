@@ -32,6 +32,12 @@ class OrderDomain:
         self.http_challenge_id = get_random_string(10)
         self.http_challenge_token = get_random_string(20)
 
+    def is_expired(self) -> bool:
+        """
+        Check if the order is expired
+        """
+        return self.expire < time.time()
+
     def http_challenge_url(self) -> str:
         """
         Get the URL where a challenge must be checked
@@ -45,6 +51,12 @@ class OrderDomain:
         :param account_jwk: The JWK of the account making the request
         :return: True if the JWK is valid, false otherwise
         """
+
+        if self.is_expired():
+            raise OrderException(
+                "Can not check an HTTP challenge for an expired order!"
+            )
+
         response = requests.get(
             self.http_challenge_url(), allow_redirects=True, timeout=10
         )
@@ -123,7 +135,7 @@ class Order:
         """
         Check if all requirements of the order were full_filled
         """
-        return all(x.full_filled for x in self.domains)
+        return all(x.full_filled for x in self.domains) and not self.is_expired()
 
     def sign_csr(self, csr: str):
         """
