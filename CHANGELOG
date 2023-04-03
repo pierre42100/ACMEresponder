@@ -1,6 +1,7 @@
 V2 :
 * Nonces cleanup
 * Improve code quality (pylint node > 9.5)
+* Take in orders expiration
 
 V1 :
 * Created project

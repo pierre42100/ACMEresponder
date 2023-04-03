@@ -20,7 +20,7 @@ Planning :
   * [-] Demande et vérification des challenges de type HTTP (newOrder) 
     * [x] Première émission de certificat
     * [x] Nettoyage des anciens ordres
-    * [ ] Prise en  compte des expirations
+    * [x] Prise en  compte des expirations
     * [ ] Rate limiting
   * [x] Émission de certificats 
 
