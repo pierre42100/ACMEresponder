@@ -42,6 +42,8 @@ class NoncesManager:
     def getNewNonce() -> str:
         """
         Generate & return a new nonce
+
+        :return: The generated nonce
         """
         NoncesManager.cleanupOldNonces()
         n = Nonce()
@@ -54,6 +56,8 @@ class NoncesManager:
         Attempt to consume a nonce.
 
         If none are found, an error is thrown
+
+        :param v: The nonce to consume
         """
         for idx, n in enumerate(NONCES):
             if v == n.nonce:

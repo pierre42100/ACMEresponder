@@ -42,6 +42,9 @@ class OrderDomain:
     def check_http_challenge(self, account_jwk) -> bool:
         """
         Attempt to validate the HTTP challenge
+
+        :param account_jwk: The JWK of the account making the request
+        :return: True if the JWK is valid, false otherwise
         """
         response = requests.get(self.http_challenge_url(), allow_redirects=True)
 
@@ -89,9 +92,16 @@ class OrderDomain:
 
 
 class Order:
+    """
+    Contains orders information
+    """
+
     def __init__(self, domains: list[str], account_id: str):
         """
-        Contains orders information
+        Intialize a new order
+
+        :param domains: The domains to include in the certificate
+        :param account_id: The ID of the target account
         """
         self.id = get_random_string(10)
         self.account_id = account_id
@@ -117,6 +127,8 @@ class Order:
     def sign_csr(self, csr: str):
         """
         Sign the CSR of a client, if possible
+
+        :param csr: The CSR to sign
         """
         if self.crt is not None:
             raise OrderException("A certificate has already been issued!")
@@ -138,7 +150,7 @@ class Order:
         )
         self.cert_id = get_random_string(10)
 
-    def url(self):
+    def url(self) -> str:
         """
         Get order URL
         """
@@ -147,6 +159,8 @@ class Order:
     def status(self) -> str:
         """
         Get current order status, as text
+
+        This method is used in the `info` method of this object
         """
         if self.crt is not None:
             return "valid"
@@ -191,6 +205,10 @@ class OrdersManager:
     def create(account_id: str, domains: list[str]) -> Order:
         """
         Create a new order
+
+        :param account_id: The ID of the target account
+        :param domains: The domains included in the request
+        :return: The created order
         """
         global ORDERS
         order = Order(domains=domains, account_id=account_id)
@@ -202,6 +220,10 @@ class OrdersManager:
     def find_order_by_id(account_id: str, order_id: str) -> Order:
         """
         Find an order by its id
+
+        :param account_id: The ID of the account making the request
+        :param order_id: The ID of the target order
+        :return: Information about the order
         """
         global ORDERS
 
@@ -213,6 +235,10 @@ class OrdersManager:
     def find_order_by_cert_id(account_id: str, cert_id: str) -> Order:
         """
         Find an order by certificates id
+
+        :param account_id: The ID of the account making the request
+        :param cert_id: The ID of the certificate
+        :return: Information about the order
         """
         global ORDERS
 
@@ -226,6 +252,10 @@ class OrdersManager:
     def find_domain_by_authz_id(account_id: str, authz_id: str) -> OrderDomain:
         """
         Find an OrderDomain by its AuthzID
+
+        :param account_id: The ID of the account making the request
+        :param authz: The ID of the target authorization ID
+        :return: Information about the domain order
         """
         global ORDERS
 
@@ -242,6 +272,10 @@ class OrdersManager:
     def find_domain_by_http_chall_id(account_id: str, chall_id: str) -> OrderDomain:
         """
         Find an OrderDomain by its HTTP Challenge ID
+
+        :param account_id: The ID of the account making the request
+        :param chall_id: The ID of the challenge
+        :return: Information about the requested domain in the order
         """
         global ORDERS
 
