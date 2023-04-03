@@ -2,7 +2,6 @@
 Handling of JWS-encoded payloads
 """
 
-import base64
 import json
 
 from jwt import PyJWK

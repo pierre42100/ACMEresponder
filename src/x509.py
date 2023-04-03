@@ -175,9 +175,7 @@ class X509:
             .not_valid_before(parse_unix_time(not_before))
             .not_valid_after(parse_unix_time(not_after))
             .add_extension(
-                x509.SubjectAlternativeName(
-                    list(map(lambda d: x509.DNSName(d), domains))
-                ),
+                x509.SubjectAlternativeName(list(map(x509.DNSName, domains))),
                 critical=False,
             )
             .add_extension(

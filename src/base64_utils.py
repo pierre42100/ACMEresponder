@@ -1,3 +1,7 @@
+"""
+Base64 utilities
+"""
+
 import base64
 
 

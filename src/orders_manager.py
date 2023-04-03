@@ -3,13 +3,12 @@ Manages orders, challenges request
 """
 import json
 import time
-from src.accounts_manager import Account
-from src.base64_utils import safe_base64_decode, safe_base64_encode
-from src.config import settings
-from src.rand_utils import get_random_string
 from hashlib import sha256
 import requests
 
+from src.base64_utils import safe_base64_decode, safe_base64_encode
+from src.config import settings
+from src.rand_utils import get_random_string
 from src.time_utils import fmt_time
 from src.x509 import X509
 
@@ -46,7 +45,9 @@ class OrderDomain:
         :param account_jwk: The JWK of the account making the request
         :return: True if the JWK is valid, false otherwise
         """
-        response = requests.get(self.http_challenge_url(), allow_redirects=True)
+        response = requests.get(
+            self.http_challenge_url(), allow_redirects=True, timeout=10
+        )
 
         if response.status_code != 200:
             return False

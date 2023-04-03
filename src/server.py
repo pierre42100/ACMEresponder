@@ -3,13 +3,14 @@ Core project code
 """
 
 from fastapi import FastAPI, Request, Response
-from src.accounts_manager import AccountManager
+from fastapi.responses import PlainTextResponse
 
+
+from src.accounts_manager import AccountManager
 from src.config import settings
 from src.jws import JWSReq
 from src.nonce import NoncesManager
 from src.orders_manager import OrdersManager
-from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
@@ -107,7 +108,7 @@ def new_account(req: JWSReq, response: Response):
 
 
 @app.post("/acme/new-order", status_code=201)
-def new_account(req: JWSReq, response: Response):
+def new_order(req: JWSReq, response: Response):
     """
     Start a new order eg. enter in the process of issuing
     a new certificate
@@ -172,7 +173,7 @@ def finalize_order(order_id: str, req: JWSReq, response: Response):
 
 
 @app.post("/acme/cert/{cert_id}", response_class=PlainTextResponse)
-def finalize_order(cert_id: str, req: JWSReq, response: Response):
+def get_certificate(cert_id: str, req: JWSReq, response: Response):
     """
     Retrieve the issued certificate
     """
