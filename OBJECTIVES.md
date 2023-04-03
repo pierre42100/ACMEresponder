@@ -26,7 +26,7 @@ Planning :
 
 * Troisième jalon : (07/04/2023) 
   * [ ] Construction d’une documentation de la mise en place (préparation de l’AC racine, politique d’émission...) 
-  * [ ] Dockerisation de la solution 
+  * [x] Dockerisation de la solution 
 
 * Jalons bonus 
   * [ ] Révocation des certificats (revokeCert) 
