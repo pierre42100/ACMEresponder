@@ -99,7 +99,7 @@ class Order:
 
     def __init__(self, domains: list[str], account_id: str):
         """
-        Intialize a new order
+        Initialize a new order
 
         :param domains: The domains to include in the certificate
         :param account_id: The ID of the target account
@@ -193,14 +193,21 @@ class Order:
         return status
 
 
-# TODO : cleanup old orders
-ORDERS: list[Order] = []
-
-
 class OrdersManager:
     """
     Orders manager
     """
+
+    ORDERS: list[Order] = []
+
+    @staticmethod
+    def cleanupOldOrders():
+        """
+        Remove outdated orders from the list
+        """
+        OrdersManager.ORDERS = list(
+            filter(lambda x: not x.is_expired(), OrdersManager.ORDERS)
+        )
 
     @staticmethod
     def create(account_id: str, domains: list[str]) -> Order:
@@ -211,10 +218,9 @@ class OrdersManager:
         :param domains: The domains included in the request
         :return: The created order
         """
-        global ORDERS
         order = Order(domains=domains, account_id=account_id)
-        ORDERS = list(filter(lambda o: not o.is_expired(), ORDERS))
-        ORDERS.append(order)
+        OrdersManager.cleanupOldOrders()
+        OrdersManager.ORDERS.append(order)
         return order
 
     @staticmethod
@@ -226,10 +232,12 @@ class OrdersManager:
         :param order_id: The ID of the target order
         :return: Information about the order
         """
-        global ORDERS
 
         return next(
-            filter(lambda x: x.account_id == account_id and x.id == order_id, ORDERS)
+            filter(
+                lambda x: x.account_id == account_id and x.id == order_id,
+                OrdersManager.ORDERS,
+            )
         )
 
     @staticmethod
@@ -241,11 +249,11 @@ class OrdersManager:
         :param cert_id: The ID of the certificate
         :return: Information about the order
         """
-        global ORDERS
 
         return next(
             filter(
-                lambda x: x.account_id == account_id and x.cert_id == cert_id, ORDERS
+                lambda x: x.account_id == account_id and x.cert_id == cert_id,
+                OrdersManager.ORDERS,
             )
         )
 
@@ -258,9 +266,8 @@ class OrdersManager:
         :param authz: The ID of the target authorization ID
         :return: Information about the domain order
         """
-        global ORDERS
 
-        for order in ORDERS:
+        for order in OrdersManager.ORDERS:
             if order.account_id != account_id:
                 continue
             for domain in order.domains:
@@ -278,9 +285,8 @@ class OrdersManager:
         :param chall_id: The ID of the challenge
         :return: Information about the requested domain in the order
         """
-        global ORDERS
 
-        for order in ORDERS:
+        for order in OrdersManager.ORDERS:
             if order.account_id != account_id:
                 continue
             for domain in order.domains:

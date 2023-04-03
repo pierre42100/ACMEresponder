@@ -19,7 +19,7 @@ Planning :
   * [x] Préparation d’une autorité de certification 
   * [-] Demande et vérification des challenges de type HTTP (newOrder) 
     * [x] Première émission de certificat
-    * [ ] Nettoyage des anciens ordres
+    * [x] Nettoyage des anciens ordres
     * [ ] Prise en  compte des expirations
     * [ ] Rate limiting
   * [x] Émission de certificats 
