@@ -4,7 +4,7 @@ Objectifs clairs : Le projet est réussi si :
 
 * Il dispose d’une documentation dans le code source et un readme expliquant comment l'exécuter 
 * Il permet d’obtenir de manière sécurisée des certificats d’une autorité de certification 
-* Le code est propre (coding style) 
+* Le code est propre (note > 8 dans pylint pour le dossier `src`) 
 
 Planning : 
 
@@ -15,7 +15,7 @@ Planning :
   * [x] Génération des nonces (newNonce) 
   * [x] Création des comptes utilisateurs (newAccount) 
 
-* Second jalon :  
+* Second jalon :  (05/04/2023) 
   * [x] Préparation d’une autorité de certification 
   * [-] Demande et vérification des challenges de type HTTP (newOrder) 
     * [x] Première émission de certificat
@@ -24,7 +24,7 @@ Planning :
     * [ ] Rate limiting
   * [x] Émission de certificats 
 
-* Troisième jalon : 
+* Troisième jalon : (07/04/2023) 
   * [ ] Construction d’une documentation de la mise en place (préparation de l’AC racine, politique d’émission...) 
   * [ ] Dockerisation de la solution 
 
