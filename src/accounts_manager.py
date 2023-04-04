@@ -37,6 +37,10 @@ class AccountManager:
     def account_path(accId: str) -> Path:
         """
         Get the path to the file containing an account's information
+
+        :param accID: The ID fo the target account
+        :return: The path where the information about the account are
+            stored
         """
         return Path(os.path.join(settings.storage_path, "accounts", accId))
 
@@ -46,6 +50,9 @@ class AccountManager:
         Create a new account
 
         Generates an accounts ID and dumps the account key
+
+        :param jwk: The JWK of the account
+        :return: The ID of the created account
         """
         accId = get_random_string(14)
 
@@ -68,6 +75,8 @@ class AccountManager:
     def getAccount(accId: str) -> Account:
         """
         Get an existing account information
+
+        :param accId: The ID of the target account
         """
         with open(AccountManager.account_path(accId), "r", encoding="utf-8") as f:
             return Account(accId, json.loads(f.read()))
@@ -76,5 +85,7 @@ class AccountManager:
     def getAccountByKid(kid: str) -> Account:
         """
         Get an existing account by its kid. ie by its order URL
+
+        :param kid: The account URL
         """
         return AccountManager.getAccount(kid.split("/acme/acct/")[1].split("/")[0])

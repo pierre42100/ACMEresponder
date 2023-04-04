@@ -53,9 +53,16 @@ class X509:
     """
 
     @staticmethod
-    def generate_selfsigned_cert(hostname, ip_addresses=None, key=None):
+    def generate_selfsigned_cert(hostname: str, ip_addresses=None, key=None):
         """
         Generates self signed certificate for a hostname, and optional IP addresses.
+
+        :param hostname: The hostname of the certificate to include
+        :param ip_addresses: Optional IP address to include in the
+            certificate information
+        :param key: If the key of the certificate already exists, specify
+            it in this parameter. Otherwise, a private key will be automatically
+            generated.
         """
 
         # Generate our key
@@ -114,6 +121,9 @@ class X509:
         Check if a CSR is valid for signature
 
         Only the CN attribute of the subject is expected
+
+        :param csrb: The bytes of the CSR file, in DER format
+        :param domains: The domains that are allowed to be present in the CSR
         """
         csr = x509.load_der_x509_csr(csrb)
 
@@ -144,6 +154,13 @@ class X509:
     ) -> bytes:
         """
         Sign a CRL with a certification authority
+
+        :param ca_privkey: The CA private key bytes, in PEM format
+        :param ca_pubkey: The CA public key bytes, in PEM format
+        :param csr: The CSR file, in DER format
+        :param domains: The domains to be included in the request
+        :param not_before: The notBefore attribute of the certificate
+        :param not_after: The notAfter attribute of the certificate
         """
         crl_parsed = x509.load_der_x509_csr(csr)
         ca_privkey_parsed = load_pem_private_key(ca_privkey, password=None)
@@ -158,9 +175,7 @@ class X509:
             .not_valid_before(parse_unix_time(not_before))
             .not_valid_after(parse_unix_time(not_after))
             .add_extension(
-                x509.SubjectAlternativeName(
-                    list(map(lambda d: x509.DNSName(d), domains))
-                ),
+                x509.SubjectAlternativeName(list(map(x509.DNSName, domains))),
                 critical=False,
             )
             .add_extension(

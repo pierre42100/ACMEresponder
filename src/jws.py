@@ -2,7 +2,6 @@
 Handling of JWS-encoded payloads
 """
 
-import base64
 import json
 
 from jwt import PyJWK
@@ -35,7 +34,17 @@ class JWS:
         checkNonce: bool = True,
     ):
         """
-        Initialize a new JWS from a request
+        Initialize a new JWS from a request & check it
+
+        :param protected: The protected key of the request
+        :param payload: The payload key of the request
+        :param signature: The signature of the payload
+        :param jwk: The JWK to use to check the signature of the JWS,
+            by default either the account
+        :param newAccount: Set to true if the JWS if originating from
+            a newAccount request
+        :param checkNonce: Specify whether the nonce included in the request
+            has to be verified or not
         """
         self.protected = json.loads(safe_base64_decode(protected))
         self.payload = (
@@ -92,7 +101,15 @@ class JWSReq(BaseModel):
         action: str = "new-acct",
     ) -> JWS:
         """
-        Parse a JWS included in a request
+        Parse a JWS included in a request, and construct
+        a JWS object from it
+
+        :param newAccount: Set to true if the JWS if originating from
+            a newAccount request
+        :param checkNonce: Specify whether the nonce included in the JWS
+            must be checked
+        :param action: The action URI of the request, to control its conformity
+            with the one included in the request
         """
         jws = JWS(
             protected=self.protected,

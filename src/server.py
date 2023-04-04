@@ -3,15 +3,23 @@ Core project code
 """
 
 from fastapi import FastAPI, Request, Response
-from src.accounts_manager import AccountManager
+from fastapi.responses import PlainTextResponse
 
+from slowapi.errors import RateLimitExceeded
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+
+
+from src.accounts_manager import AccountManager
 from src.config import settings
 from src.jws import JWSReq
 from src.nonce import NoncesManager
 from src.orders_manager import OrdersManager
-from fastapi.responses import PlainTextResponse
 
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 class StartupException(Exception):
@@ -82,14 +90,16 @@ def directory():
 
 @app.head("/acme/new-nonce")
 @app.get("/acme/new-nonce", status_code=204)
-def new_nonce():
+@limiter.limit("100/minute")
+def new_nonce(request: Request):
     """
     Request a new nonce
     """
 
 
 @app.post("/acme/new-acct", status_code=201)
-def new_account(req: JWSReq, response: Response):
+@limiter.limit("10/minute")
+def new_account(req: JWSReq, request: Request, response: Response):
     """
     Register a new account
     """
@@ -107,7 +117,8 @@ def new_account(req: JWSReq, response: Response):
 
 
 @app.post("/acme/new-order", status_code=201)
-def new_account(req: JWSReq, response: Response):
+@limiter.limit("10/minute")
+def new_order(req: JWSReq, request: Request, response: Response):
     """
     Start a new order eg. enter in the process of issuing
     a new certificate
@@ -145,7 +156,8 @@ def authz_status(authz_id: str, req: JWSReq):
 
 
 @app.post("/acme/chall/{chall_id}")
-def try_challenge(chall_id: str, req: JWSReq):
+@limiter.limit("5/minute")
+def try_challenge(chall_id: str, request: Request, req: JWSReq):
     """
     Attempt to validate a challenge
     """
@@ -158,7 +170,8 @@ def try_challenge(chall_id: str, req: JWSReq):
 
 
 @app.post("/acme/order/{order_id}/finalize")
-def finalize_order(order_id: str, req: JWSReq, response: Response):
+@limiter.limit("10/minute")
+def finalize_order(order_id: str, req: JWSReq, request: Request, response: Response):
     """
     Submit the CSR to be signed
     """
@@ -172,7 +185,8 @@ def finalize_order(order_id: str, req: JWSReq, response: Response):
 
 
 @app.post("/acme/cert/{cert_id}", response_class=PlainTextResponse)
-def finalize_order(cert_id: str, req: JWSReq, response: Response):
+@limiter.limit("60/minute")
+def get_certificate(cert_id: str, req: JWSReq, request: Request, response: Response):
     """
     Retrieve the issued certificate
     """

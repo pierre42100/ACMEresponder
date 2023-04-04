@@ -21,31 +21,33 @@ class Nonce:
         self.nonce = get_random_string(15)
 
 
-# The list of nonces
-NONCES: list[Nonce] = []
-
-
 class NoncesManager:
     """
     Helper class to manage nonces
     """
+
+    NONCES: list[Nonce] = []
 
     @staticmethod
     def cleanupOldNonces():
         """
         Remove outdated nonces from the list
         """
-        global NONCES
-        NONCES = list(filter(lambda x: time.time() < x.expire, NONCES))
+
+        NoncesManager.NONCES = list(
+            filter(lambda x: time.time() < x.expire, NoncesManager.NONCES)
+        )
 
     @staticmethod
     def getNewNonce() -> str:
         """
         Generate & return a new nonce
+
+        :return: The generated nonce
         """
         NoncesManager.cleanupOldNonces()
         n = Nonce()
-        NONCES.append(n)
+        NoncesManager.NONCES.append(n)
         return n.nonce
 
     @staticmethod
@@ -54,9 +56,11 @@ class NoncesManager:
         Attempt to consume a nonce.
 
         If none are found, an error is thrown
+
+        :param v: The nonce to consume
         """
-        for idx, n in enumerate(NONCES):
+        for idx, n in enumerate(NoncesManager.NONCES):
             if v == n.nonce:
-                NONCES.pop(idx)
+                NoncesManager.NONCES.pop(idx)
                 return True
         return False

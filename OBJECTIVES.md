@@ -19,14 +19,14 @@ Planning :
   * [x] Préparation d’une autorité de certification 
   * [-] Demande et vérification des challenges de type HTTP (newOrder) 
     * [x] Première émission de certificat
-    * [ ] Nettoyage des anciens ordres
-    * [ ] Prise en  compte des expirations
-    * [ ] Rate limiting
+    * [x] Nettoyage des anciens ordres
+    * [x] Prise en  compte des expirations
+    * [x] Rate limiting
   * [x] Émission de certificats 
 
 * Troisième jalon : (07/04/2023) 
   * [ ] Construction d’une documentation de la mise en place (préparation de l’AC racine, politique d’émission...) 
-  * [ ] Dockerisation de la solution 
+  * [x] Dockerisation de la solution 
 
 * Jalons bonus 
   * [ ] Révocation des certificats (revokeCert) 
