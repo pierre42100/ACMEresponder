@@ -11,31 +11,28 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/tips_and_updates_FILL0_wght400_GRAD0_opsz48.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        All you need is Docker and a certification authority to use to sign certificates!
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Automated',
+    Svg: require('@site/static/img/autorenew_FILL0_wght400_GRAD0_opsz48.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Automatically renew certificates in your environment
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'OpenSource',
+    Svg: require('@site/static/img/frame_source_FILL0_wght400_GRAD0_opsz48.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Investigate the security of ACMEResponder. It is OpenSource forever.
       </>
     ),
   },
@@ -45,7 +42,7 @@ function Feature({title, Svg, description}: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <Svg className={styles.featureSvg} role="img" style={{width: "100px"}} />
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>

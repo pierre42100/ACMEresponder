@@ -91,7 +91,7 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
+                label: 'Getting started',
                 to: '/docs/intro',
               },
             ],
@@ -117,12 +117,12 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: 'RFC',
+                to: 'https://www.rfc-editor.org/rfc/rfc8555',
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                href: 'https://github.com/pierre42100/ACMEResponder',
               },
             ],
           },
