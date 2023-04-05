@@ -65,9 +65,11 @@ class AccountManager:
         return accId
 
     @staticmethod
-    def existsAccount(accId: str):
+    def existsAccount(accId: str) -> bool:
         """
         Check out whether an account exists or not
+
+        :param accId: The ID of the account to check
         """
         return AccountManager.account_path(accId).exists()
 

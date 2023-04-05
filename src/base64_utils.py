@@ -18,6 +18,8 @@ def safe_base64_encode(un_encoded_data) -> str:
 def fix_b64_padding(s):
     """
     Fix Base64 padding potential issue
+
+    :param s: The String provided by the client
     """
     if len(s) % 4 != 0:
         s += "==="[0 : 4 - (len(s) % 4)]

@@ -42,6 +42,9 @@ if not settings.ca_certfile().exists() or not settings.ca_keyfile().exists():
 async def nonce_middleware(request: Request, call_next):
     """
     Nonce middleware: handles the processing of nonces
+
+    :param request: The request to process
+    :param call_next: Following callback
     """
     response = await call_next(request)
     response.headers["Replay-Nonce"] = NoncesManager.getNewNonce()
@@ -53,7 +56,7 @@ async def nonce_middleware(request: Request, call_next):
 @app.get("/")
 def root():
     """
-    Basic message
+    Basic welcome message
     """
     return {
         "name": "Basic ACME responder",
@@ -72,7 +75,7 @@ def tos():
 @app.get("/directory")
 def directory():
     """
-    Get routes paths
+    Get ACME routes paths
     """
     return {
         "keyChange": f"{settings.domain_uri}/acme/key-change",
@@ -94,6 +97,8 @@ def directory():
 def new_nonce(request: Request):
     """
     Request a new nonce
+
+    :param request: Required for the limiter middleware
     """
 
 
@@ -102,6 +107,10 @@ def new_nonce(request: Request):
 def new_account(req: JWSReq, request: Request, response: Response):
     """
     Register a new account
+
+    :param req: JWS data included in the request
+    :param request: Required for the limiter middleware
+    :param response: Response object used for headers manipulations
     """
     jws = req.to_jws(newAccount=True, action="new-acct")
     accountId = AccountManager.createAccount(jws.jwk)
@@ -122,6 +131,10 @@ def new_order(req: JWSReq, request: Request, response: Response):
     """
     Start a new order eg. enter in the process of issuing
     a new certificate
+
+    :param req: JWS data included in the request
+    :param request: Required for the limiter middleware
+    :param response: Response object used for headers manipulations
     """
     jws = req.to_jws(action="new-order")
 
@@ -148,6 +161,9 @@ def authz_status(authz_id: str, req: JWSReq):
     In this implementation of the ACME server, only the
     authorization for the issuance of DNS certificates
     is supported
+
+    :param authz_id: The Authorization ID
+    :param req: JWS data included in the request
     """
     jws = req.to_jws(action=f"authz/{authz_id}")
     authz = OrdersManager.find_domain_by_authz_id(jws.account_id, authz_id=authz_id)
@@ -160,6 +176,10 @@ def authz_status(authz_id: str, req: JWSReq):
 def try_challenge(chall_id: str, request: Request, req: JWSReq):
     """
     Attempt to validate a challenge
+
+    :param req: JWS data included in the request
+    :param request: Required for the limiter middleware
+    :param chall_id: The ID of the challenge to try
     """
     jws = req.to_jws(action=f"chall/{chall_id}")
     authz = OrdersManager.find_domain_by_http_chall_id(
@@ -174,6 +194,11 @@ def try_challenge(chall_id: str, request: Request, req: JWSReq):
 def finalize_order(order_id: str, req: JWSReq, request: Request, response: Response):
     """
     Submit the CSR to be signed
+
+    :param order_id: The ID of the order to finalize
+    :param req: JWS data included in the request
+    :param request: Required for the limiter middleware
+    :param response: Response object used for manipulations
     """
     jws = req.to_jws(action=f"order/{order_id}/finalize")
     order = OrdersManager.find_order_by_id(jws.account_id, order_id=order_id)
@@ -189,6 +214,11 @@ def finalize_order(order_id: str, req: JWSReq, request: Request, response: Respo
 def get_certificate(cert_id: str, req: JWSReq, request: Request, response: Response):
     """
     Retrieve the issued certificate
+
+    :param cert_id: The ID of the certificate to retrieve
+    :param req: JWS data included in the request
+    :param request: Required for the limiter middleware
+    :param response: Response object used for manipulations
     """
     jws = req.to_jws(action=f"cert/{cert_id}")
     order = OrdersManager.find_order_by_cert_id(jws.account_id, cert_id=cert_id)
