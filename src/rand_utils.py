@@ -2,8 +2,8 @@
 Random utilities
 """
 
-import string
-import random
+import base64
+import os
 
 
 def get_random_string(length: int) -> str:
@@ -13,4 +13,4 @@ def get_random_string(length: int) -> str:
     :param length: The length of the generated string
     :return: The generated string
     """
-    return "".join(random.choice(string.ascii_letters) for i in range(length))
+    return base64.b32encode(os.urandom(length))[:length].decode("utf-8")
