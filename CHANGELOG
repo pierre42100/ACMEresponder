@@ -1,5 +1,6 @@
 V3 :
 * Add documentation website
+* Fix random string generation
 
 V2 :
 * Nonces cleanup

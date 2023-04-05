@@ -25,7 +25,7 @@ Planning :
   * [x] Émission de certificats 
 
 * Troisième jalon : (07/04/2023) 
-  * [ ] Construction d’une documentation de la mise en place (préparation de l’AC racine, politique d’émission...) 
+  * [x] Construction d’une documentation de la mise en place (préparation de l’AC racine, politique d’émission...) 
   * [x] Dockerisation de la solution 
 
 * Jalons bonus 
