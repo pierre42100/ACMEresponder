@@ -114,6 +114,10 @@ const config = {
     mermaid: true,
   },
   themes: ["@docusaurus/theme-mermaid"],
+
+  plugins: [
+    require.resolve("@cmfcmf/docusaurus-search-local")
+  ]
 };
 
 module.exports = config;
