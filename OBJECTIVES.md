@@ -17,10 +17,10 @@ Planning :
 
 * Second jalon :  (05/04/2023) 
   * [x] Préparation d’une autorité de certification 
-  * [-] Demande et vérification des challenges de type HTTP (newOrder) 
+  * [x] Demande et vérification des challenges de type HTTP (newOrder) 
     * [x] Première émission de certificat
     * [x] Nettoyage des anciens ordres
-    * [x] Prise en  compte des expirations
+    * [x] Prise en compte des expirations
     * [x] Rate limiting
   * [x] Émission de certificats 
 
