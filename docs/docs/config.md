@@ -10,7 +10,8 @@ Some configuration option can be customized.
 If you are using the Docker image, you can use the `--env` argument when launching the responder to change an option:
 
 ```bash
-docker run --rm -v $(pwd)/storage:/storage -p 80:80 --env KEY=VALUE pierre42100/acme-responder```
+docker run --rm -v $(pwd)/storage:/storage -p 80:80 --env KEY=VALUE pierre42100/acme-responder
+```
 
 If you are running the project from sources, you can simply add the arguments at the beginning of the command:
 

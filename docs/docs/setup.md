@@ -32,7 +32,7 @@ openssl req -new -key storage/ca-privkey.pem -x509 -days 1000 -out storage/ca-pu
 
 :::danger
 
-Without a certificate issued by a certification authority and authorized to sign certicate (`IsCA` constraint set to true), the certificate issued by ACMEREsponder will by default not be recognized by the TLS endpoints softwares (browsers, CLI utilities...)
+Without a certificate issued by a well-known root certification authority and authorized to sign certicate (`IsCA` constraint set to true), the certificates issued by ACMEresponder won't be recognized by default by the TLS endpoints softwares (browsers, CLI utilities...)
 
 However, you can still use your self-signed certification authority on your own devices by installing them on your truststores.
 

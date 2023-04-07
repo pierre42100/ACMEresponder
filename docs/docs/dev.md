@@ -41,8 +41,8 @@ mkdir storage
 openssl genrsa -out storage/ca-privkey.pem 4096
 
 # Create a CA signing key
-```
 openssl req -new -key storage/ca-privkey.pem -x509 -days 1000 -out storage/ca-pubkey.pem -subj "/C=FR/ST=Loire/L=StEtienne/O=Global Security/OU=IT Department/CN=example.com"
+```
 
 5. Run the server
 
