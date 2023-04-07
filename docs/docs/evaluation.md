@@ -137,6 +137,10 @@ In our case, the common name will be `client` (the name of the container in the 
 
 :::
 
+:::info
+And that's it! You just generated a certificate from your very own ACME provider!!!
+:::
+
 ## Building Docker image
 By default, the given directions will pull the images from the Docker hub. However, you can also build by yourself the Docker images used in this demonstration :
 
