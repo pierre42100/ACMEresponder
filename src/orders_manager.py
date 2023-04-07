@@ -8,7 +8,7 @@ import requests
 
 from src.base64_utils import safe_base64_decode, safe_base64_encode
 from src.config import settings
-from src.rand_utils import get_random_string
+from src.rand_utils import get_random_bytes, get_random_string
 from src.time_utils import fmt_time
 from src.x509 import X509
 
@@ -30,7 +30,7 @@ class OrderDomain:
         self.expire = expire
         self.full_filled = False
         self.http_challenge_id = get_random_string(10)
-        self.http_challenge_token = get_random_string(20)
+        self.http_challenge_token = safe_base64_encode(get_random_bytes(16))
 
     def is_expired(self) -> bool:
         """
