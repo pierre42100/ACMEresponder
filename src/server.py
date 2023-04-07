@@ -48,7 +48,9 @@ async def nonce_middleware(request: Request, call_next):
     """
     response = await call_next(request)
     response.headers["Replay-Nonce"] = NoncesManager.getNewNonce()
-    response.headers["Link"] = f'<{settings.domain_uri}acme/directory>;rel="index"'
+    response.headers.append(
+        "Link", f'<{settings.domain_uri}/acme/directory>;rel="index"'
+    )
 
     return response
 
@@ -173,7 +175,7 @@ def authz_status(authz_id: str, req: JWSReq):
 
 @app.post("/acme/chall/{chall_id}")
 @limiter.limit("5/minute")
-def try_challenge(chall_id: str, request: Request, req: JWSReq):
+def try_challenge(chall_id: str, request: Request, req: JWSReq, response: Response):
     """
     Attempt to validate a challenge
 
@@ -187,6 +189,12 @@ def try_challenge(chall_id: str, request: Request, req: JWSReq):
     )
 
     authz.check_http_challenge(jws.jwk)
+
+    response.headers.append(
+        "Link", f'<{settings.domain_uri}/authz/{chall_id}>;rel="up"'
+    )
+
+    return authz.info()["challenges"][0]
 
 
 @app.post("/acme/order/{order_id}/finalize")
