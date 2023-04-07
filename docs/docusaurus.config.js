@@ -94,7 +94,7 @@ const config = {
             title: "More",
             items: [
               {
-                label: "RF C8555",
+                label: "RFC 8555",
                 to: "https://www.rfc-editor.org/rfc/rfc8555",
               },
               {
