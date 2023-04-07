@@ -71,19 +71,13 @@ openssl req -new -key storage/ca-privkey.pem -x509 -days 1000 -out storage/ca-pu
 ## Execute the solution
 In order to run the solution, you must have `docker` and `docker-compose` installed on your computer.
 
-Open the `evaluation` directory located at the root of the project:
-
-```bash
-cd evaluation
-```
-
-Deploy the environment:
+Deploy the `docker-compose` network (still from the `evaluation` directory):
 
 ```bash
 docker-compose up
 ```
 
-Three dockers images will be pulled from the Docker Hub, including our solution, in production mode.
+Three Docker images will be pulled from the Docker Hub, including our solution, in production mode.
 
 
 ## Test certificates issuance
