@@ -23,4 +23,4 @@ def fmt_time(t: int) -> str:
     :return: A string that can be send in response to
         client requests.
     """
-    return datetime.datetime.fromtimestamp(t).isoformat()
+    return datetime.datetime.fromtimestamp(t).isoformat("T") + "Z"
