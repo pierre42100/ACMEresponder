@@ -40,6 +40,19 @@ The certificate of the reverse proxy is signed by a self-signed Certification Au
 The reverse proxy redirect traffic to the `acme` container, which runs our solution. This machine can directly query the client for the authentication challenges during certificates issuance.
 
 
+## Get the source code
+In order to get started, you must first clone the repository:
+
+```bash
+git clone https://github.com/pierre42100/ACMEresponder
+```
+
+Then you must enter inside the `evaluation` directory:
+
+```bash
+cd ACMEresponder/evaluation
+```
+
 ## Prepare the storage
 First, you need to initialize the Certification Authority that will be used to sign issued certificates :
 
