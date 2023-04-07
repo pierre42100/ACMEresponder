@@ -197,6 +197,24 @@ def try_challenge(chall_id: str, request: Request, req: JWSReq, response: Respon
     return authz.info()["challenges"][0]
 
 
+@app.post("/acme/order/{order_id}")
+@limiter.limit("10/minute")
+def order_info(order_id: str, req: JWSReq, request: Request, response: Response):
+    """
+    Get information about an order
+
+    :param order_id: The ID of the order to finalize
+    :param req: JWS data included in the request
+    :param request: Required for the limiter middleware
+    :param response: Response object used for manipulations
+    """
+    jws = req.to_jws(action=f"order/{order_id}")
+    order = OrdersManager.find_order_by_id(jws.account_id, order_id=order_id)
+
+    response.headers["Location"] = order.url()
+    return order.info()
+
+
 @app.post("/acme/order/{order_id}/finalize")
 @limiter.limit("10/minute")
 def finalize_order(order_id: str, req: JWSReq, request: Request, response: Response):
