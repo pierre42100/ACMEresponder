@@ -85,3 +85,10 @@ STORAGE_PATH=/path/to/storage uvicorn src.server:app --host 0.0.0.0 --port 80
 
 ## Configuration
 Some aspects of ACMEResponder can be customized. See the [Configuration](./config) section to learn more.
+
+## Build Docker image
+If you wish to build by yourself the Docker image of the project, you can do so by running the following command:
+
+```bash
+bash build-docker-image.sh
+```
