@@ -65,8 +65,9 @@ class JWS:
             raise JWSException("JWS headers are incomplete!")
         self.url = self.protected["url"]
 
-        if checkNonce and not NoncesManager.consumeNonce(self.protected["nonce"]):
-            raise JWSException("Nonce is invalid!")
+        self.nonce = self.protected["nonce"]
+        if checkNonce and not NoncesManager.consumeNonce(self.nonce):
+            raise JWSException(f"Nonce '{self.nonce}' is invalid!")
 
         if jwk is not None:
             self.jwk = jwk
