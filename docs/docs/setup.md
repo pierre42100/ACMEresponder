@@ -32,9 +32,9 @@ openssl req -new -key storage/ca-privkey.pem -x509 -days 1000 -out storage/ca-pu
 
 :::danger
 
-Without a certificate issued by a well-known root certification authority and authorized to sign certicate (`IsCA` constraint set to true), the certificates issued by ACMEresponder won't be recognized by default by the TLS endpoints softwares (browsers, CLI utilities...)
+Without a certificate issued by a well-known root certification authority and authorized to sign certificate (`IsCA` constraint set to true), the certificates issued by ACMEResponder won't be recognized by default by the TLS endpoints software programs (browsers, CLI utilities...)
 
-However, you can still use your self-signed certification authority on your own devices by installing them on your truststores.
+However, you can still use your self-signed certification authority on your own devices by installing them on your trusted certificates store.
 
 :::
 
@@ -77,7 +77,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. You should then be ready to run  the server:
+5. You should then be ready to run the server:
 
 ```bash
 STORAGE_PATH=/path/to/storage uvicorn src.server:app --host 0.0.0.0 --port 80

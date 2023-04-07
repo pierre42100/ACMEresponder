@@ -5,14 +5,14 @@ sidebar_position: 7
 # Evaluation
 This project was achieved during a "Python for Security" course at EPITA.
 
-In order to validate the course, the teacher asked us to provides him some guidelines to allow him to easly and quickly try out the solution built. Here are presented those instructions.
+In order to validate the course, the teacher asked us to give him some guidelines to allow him to easily and quickly try out the solution built. Here are presented those instructions.
 
 ## Environment
 In order to assess our ACME responder, we decided to use the most popular ACME client, `certbot`. ([official website](https://certbot.eff.org/)).
 
-Unfortunately, Certbot is certainly the most rigorous ACME client, as the contrary of sewer (used in unit testing, which is more laxist). Certbot expect from the ACME provider a strict compliance to the standards. One of these requirements is that an ACME server shall not be queried in HTTP. 
+Unfortunately, Certbot is certainly the most rigorous ACME client, as the contrary of sewer (used in unit testing, which is more permissive). Certbot expect from the ACME provider a strict compliance to the standards. One of these requirements is that an ACME server shall not be queried in HTTP. 
 
-Therefore we had to setup an local environment where ACME responder could be reached in HTTPS. In order to achieve this goal, we needed to create a self signed authority that would sign a certificate used for a TLS reverse proxy.
+Therefore, we had to set up a local environment where ACME responder could be reached in HTTPS. In order to achieve this goal, we needed to create a self-signed authority that would sign a certificate used for a TLS reverse proxy.
 
 We built such environment using Docker Compose :
 
@@ -41,7 +41,7 @@ The reverse proxy redirect traffic to the `acme` container, which runs our solut
 
 
 ## Prepare the storage
-First, you need to intialize the Certification Authority that will be used to sign issued certificates :
+First, you need to initialize the Certification Authority that will be used to sign issued certificates :
 
 ```bash
 # Create storage directory
@@ -70,7 +70,7 @@ Deploy the environment:
 docker-compose up
 ```
 
-Three dockers image will be pulled from the Docker Hub, including our solution, in production mode.
+Three dockers images will be pulled from the Docker Hub, including our solution, in production mode.
 
 
 ## Test certificates issuance
