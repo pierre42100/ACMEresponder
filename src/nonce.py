@@ -3,7 +3,10 @@ Nonces management
 """
 
 import time
+import threading
 from src.rand_utils import get_random_string
+
+lock = threading.Lock()
 
 
 class Nonce:
@@ -45,9 +48,11 @@ class NoncesManager:
 
         :return: The generated nonce
         """
+        lock.acquire()
         NoncesManager.cleanupOldNonces()
         n = Nonce()
         NoncesManager.NONCES.append(n)
+        lock.release()
         return n.nonce
 
     @staticmethod
@@ -59,8 +64,11 @@ class NoncesManager:
 
         :param v: The nonce to consume
         """
+        lock.acquire()
         for idx, n in enumerate(NoncesManager.NONCES):
             if v == n.nonce:
                 NoncesManager.NONCES.pop(idx)
+                lock.release()
                 return True
+        lock.release()
         return False
