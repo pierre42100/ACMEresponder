@@ -131,9 +131,9 @@ class X509:
             raise X509Exception("Signature of CRL file is invalid!")
 
         subj_domain = csr.subject.rfc4514_string().replace("CN=", "")
-        if not subj_domain in domains:
+        if not subj_domain in domains and not len(subj_domain) == 0:
             raise X509Exception(
-                f"Subject {subj_domain} should be one of the domains name!"
+                f"Subject '{subj_domain}' should be one of the domains name!"
             )
 
         # Check altnames
@@ -164,13 +164,19 @@ class X509:
         :param not_before: The notBefore attribute of the certificate
         :param not_after: The notAfter attribute of the certificate
         """
-        crl_parsed = x509.load_der_x509_csr(csr)
+        csr_parsed = x509.load_der_x509_csr(csr)
         ca_privkey_parsed = load_pem_private_key(ca_privkey, password=None)
         ca_pubkey_parsed = x509.load_pem_x509_certificate(ca_pubkey)
 
+        subj_name = (
+            x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, domains[0])])
+            if len(csr_parsed.subject.rfc4514_string().replace("CN=", "")) == 0
+            else csr_parsed.subject
+        )
+
         cert = (
             x509.CertificateBuilder()
-            .subject_name(crl_parsed.subject)
+            .subject_name(subj_name)
             .issuer_name(ca_pubkey_parsed.issuer)
             .public_key(ca_pubkey_parsed.public_key())
             .serial_number(x509.random_serial_number())
