@@ -40,6 +40,20 @@ The certificate of the reverse proxy is signed by a self-signed Certification Au
 The reverse proxy redirect traffic to the `acme` container, which runs our solution. This machine can directly query the client for the authentication challenges during certificates issuance.
 
 
+## Prepare the storage
+First, you need to intialize the Certification Authority that will be used to sign issued certificates :
+
+```bash
+# Create storage directory
+mkdir storage
+
+# Create a CA private key
+openssl genrsa -out storage/ca-privkey.pem 4096
+
+# Create a CA signing key
+openssl req -new -key storage/ca-privkey.pem -x509 -days 1000 -out storage/ca-pubkey.pem -subj "/C=FR/ST=Loire/L=StEtienne/O=Global Security/OU=IT Department/CN=example.com"
+```
+
 
 ## Execute the solution
 In order to run the solution, you must have `docker` and `docker-compose` installed on your computer.
