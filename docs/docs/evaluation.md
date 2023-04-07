@@ -16,7 +16,7 @@ Therefore, we had to set up a local environment where ACME responder could be re
 
 We built such environment using Docker Compose :
 
-```
+```mermaid
 flowchart TD
     srv[ACME Responder<br><small>Our solution</small>]
     proxy[Secure<br><small>Reverse Proxy / TLS endpoint</small>]
