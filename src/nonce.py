@@ -4,6 +4,7 @@ Nonces management
 
 import time
 import threading
+from src.base64_utils import safe_base64_encode
 from src.rand_utils import get_random_string
 
 lock = threading.Lock()
@@ -21,7 +22,7 @@ class Nonce:
         Nonce are valid for 1 hour
         """
         self.expire = time.time() + 3600
-        self.nonce = get_random_string(15)
+        self.nonce = safe_base64_encode(get_random_string(15))
 
 
 class NoncesManager:
