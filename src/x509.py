@@ -132,7 +132,9 @@ class X509:
 
         subj_domain = csr.subject.rfc4514_string().replace("CN=", "")
         if not subj_domain in domains:
-            raise X509Exception("Subject should be one of the domains name!")
+            raise X509Exception(
+                f"Subject {subj_domain} should be one of the domains name!"
+            )
 
         # Check altnames
         altNames = csr.extensions.get_extension_for_oid(
