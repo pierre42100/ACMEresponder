@@ -97,6 +97,12 @@ If the previous command does not work, use the command `docker ps` to get the na
 ```bash
 docker ps | grep pierre42100/acme-eval-client
 ```
+
+Depending on your version of `docker-compose` the following command could work instead:
+
+```bash
+docker exec -it evaluation_client_1 /bin/bash
+```
 :::
 
 In the container, you can request a new certificate issuance:
@@ -150,7 +156,7 @@ In our case, the common name will be `client` (the name of the container in the 
 And that's it! You just generated a certificate from your very own ACME provider!!!
 :::
 
-## Manually build Docker image
+## Manually build Docker images
 By default, the given directions will pull the images from the Docker hub. However, you can also build by yourself the Docker images used in this demonstration :
 
 ```bash
