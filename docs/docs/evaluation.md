@@ -37,6 +37,10 @@ In this environment, the client (hostname `client`) can query the ACMEResponder 
 The certificate of the reverse proxy is signed by a self-signed Certification Authority, so the client must either accept all certificates or add the self-signed Certification Authority to its trusted certificates store. We opted for the latter solution.
 :::
 
+:::danger
+For the sake of simplicity, we hardcoded some certificates and private keys in the `evaluation` directory. Because these keys are publicly available, they MUST NEVER be used in production!
+:::
+
 The reverse proxy redirect traffic to the `acme` container, which runs our solution. This machine can directly query the client for the authentication challenges during certificates issuance.
 
 
@@ -124,7 +128,12 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-You can then inspect the details of the generated certificate:
+:::tip
+You can use Wireshark to capture and check the exchange between Certbot and ACMEResponder
+:::
+
+## Check issued certificate
+You can then inspect the details of the generated certificate (still within `client` Docker container):
 
 ```bash
 openssl x509 -in /etc/letsencrypt/live/client/fullchain.pem -text -noout
@@ -141,7 +150,7 @@ In our case, the common name will be `client` (the name of the container in the 
 And that's it! You just generated a certificate from your very own ACME provider!!!
 :::
 
-## Building Docker image
+## Manually build Docker image
 By default, the given directions will pull the images from the Docker hub. However, you can also build by yourself the Docker images used in this demonstration :
 
 ```bash
